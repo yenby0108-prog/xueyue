@@ -1,0 +1,13 @@
+{
+  "name": "xueyue-zhongta",
+  "version": "1.0.0",
+  "description": "血月鐘塔：原創中文陣營推理遊戲，房號＋密碼線上遊玩",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

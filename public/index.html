@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1217">
+<title>血月鐘塔</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap">
+<style>
+/* Layout: 圓桌城鎮在左、說書／弟子操作面板在右；窄螢幕疊成一欄。刻意只做一套夜色主題。 */
+:root{
+  --ink:#0f1217; --ink2:#171b23; --ink3:#212733; --line:#2f3746;
+  --paper:#ece5d3; --muted:#9a9483; --gold:#d6b26b; --gold-ink:#241c0e;
+  --jade:#74b69e; --cinna:#d6553f; --blood:#a1342a; --moon:#b9c3d6;
+  --f-disp:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink);color:var(--paper);margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+.lobby-hero{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding-block:28px 8px}
+.lobby-hero .seal{width:72px;height:72px;font-size:44px}
+.lobby-hero h1{font-size:2.4rem}
+.lobby-hero p{color:var(--muted);max-width:32em}
+.entry{display:grid;gap:16px;grid-template-columns:minmax(0,1fr);max-width:820px;margin:16px auto 0}
+@media (min-width:720px){.entry{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field span{font-size:.8rem;color:var(--muted);letter-spacing:.1em}
+.field input[type=text]{width:100%;flex:none}
+.err{color:var(--cinna);font-size:.9rem;min-height:1.2em}
+.code-big{font-family:var(--f-disp);font-size:2.2rem;letter-spacing:.2em;font-variant-numeric:tabular-nums;color:var(--gold)}
+.roomchip{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--jade);box-shadow:0 0 6px rgba(116,182,158,.7)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.6;
+  background:radial-gradient(1100px 520px at 50% -8%,#1c2332 0%,rgba(15,18,23,0) 70%),var(--ink);min-height:100%}
+.wrap{max-width:1180px;margin:0 auto;padding-block:16px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-disp);font-weight:900;text-wrap:balance;margin:0;letter-spacing:.04em}
+h2{font-size:1.35rem} h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* header */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.seal{width:44px;height:44px;border-radius:6px;background:var(--blood);color:#f6e7d6;display:grid;place-items:center;font-family:var(--f-disp);font-weight:900;font-size:26px;box-shadow:inset 0 0 0 2px rgba(246,231,214,.25);transform:rotate(-4deg)}
+.brand h1{font-size:1.5rem;line-height:1.1}
+.brand p{color:var(--muted);font-size:.82rem;letter-spacing:.08em}
+.phase{font-family:var(--f-disp);font-weight:600;font-size:1.05rem;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--ink2);letter-spacing:.12em}
+.phase.night{color:var(--moon)} .phase.day{color:var(--gold)} .phase.end{color:var(--cinna)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
+.tab{background:none;border:1px solid transparent;border-radius:8px;padding:6px 14px;color:var(--muted);cursor:pointer;letter-spacing:.06em}
+.tab:hover{color:var(--paper)}
+.tab.on{color:var(--paper);border-color:var(--line);background:var(--ink2)}
+
+.layout{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:920px){.layout{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}}
+@media (max-width:919px){.first-m{order:-1}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.eyebrow{font-size:.75rem;letter-spacing:.18em;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+
+.btn{border:1px solid var(--line);background:var(--ink3);border-radius:8px;padding:7px 14px;cursor:pointer;line-height:1.3}
+.btn:hover{border-color:#4a5468}
+.btn.pri{background:var(--gold);border-color:var(--gold);color:var(--gold-ink);font-weight:700}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.red{background:var(--blood);border-color:var(--blood);color:#fbeee4}
+.btn.ghost{background:none}
+.btn.sm{padding:4px 10px;font-size:.85rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.big{font-size:1.05rem;padding:12px 18px}
+
+input[type=text],select,textarea,input[type=number]{background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:64px}
+input[type=number]{width:56px;padding:4px 6px}
+input[type=text]{flex:1 1 160px}
+
+.tag{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);letter-spacing:.06em;white-space:nowrap}
+.tag.good{color:var(--jade);border-color:rgba(116,182,158,.45)}
+.tag.burden{color:#a9c4b4;border-color:rgba(169,196,180,.35)}
+.tag.minion{color:var(--cinna);border-color:rgba(214,85,63,.45)}
+.tag.demon{color:#fbeee4;background:var(--blood);border-color:var(--blood)}
+.tag.dead{color:var(--muted)}
+
+/* town */
+.town{position:relative;width:100%;max-width:560px;margin:0 auto;aspect-ratio:1;container-type:inline-size}
+.town::before{content:"";position:absolute;inset:13%;border-radius:50%;border:1px dashed var(--line)}
+.town-c{position:absolute;inset:30%;border-radius:50%;display:grid;place-items:center;text-align:center;background:radial-gradient(circle,#1a2030 0%,rgba(23,27,35,0) 72%)}
+.town-c .glyph{font-family:var(--f-disp);font-weight:900;font-size:17cqw;line-height:1}
+.town-c .glyph.night{color:var(--moon);text-shadow:0 0 30px rgba(185,195,214,.35)}
+.town-c .glyph.day{color:var(--gold);text-shadow:0 0 30px rgba(214,178,107,.35)}
+.town-c .sub{font-size:3.4cqw;color:var(--muted);letter-spacing:.2em;margin-top:1cqw}
+.tok{position:absolute;transform:translate(-50%,-50%);border-radius:50%;aspect-ratio:1;background:var(--ink3);border:2px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4%;cursor:default;line-height:1.15;transition:border-color .2s}
+button.tok{cursor:pointer}
+.tok .n{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tok .r{font-size:.78em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.2em}
+.tok .r.good{color:var(--jade)} .tok .r.burden{color:#a9c4b4} .tok .r.minion{color:var(--cinna)} .tok .r.demon{color:#ff9c86}
+.tok.me{border-color:var(--gold)}
+.tok.empty{background:transparent;border-style:dashed;color:var(--muted)}
+button.tok.empty:hover{border-color:var(--gold);color:var(--gold);background:rgba(214,178,107,.06)}
+.tok.sel{border-color:var(--paper);box-shadow:0 0 0 3px rgba(236,229,211,.18)}
+.tok.dead{background:var(--ink);color:var(--muted)}
+.tok.dead::after{content:"殞";position:absolute;right:-6%;bottom:-6%;width:38%;aspect-ratio:1;border-radius:4px;background:var(--blood);color:#f6e7d6;font-family:var(--f-disp);font-weight:900;display:grid;place-items:center;font-size:.9em;transform:rotate(8deg)}
+.tok .ghost{position:absolute;left:-2%;top:-2%;width:26%;aspect-ratio:1;border-radius:50%;background:var(--jade);box-shadow:0 0 8px rgba(116,182,158,.7)}
+.tok.nom{border-color:var(--cinna);animation:pulse 1.4s ease-in-out infinite}
+.tok .hand{position:absolute;right:-4%;top:-4%;background:var(--gold);color:var(--gold-ink);border-radius:999px;font-size:.75em;font-weight:700;padding:.1em .45em}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(214,85,63,.25)}}
+@media (prefers-reduced-motion:reduce){.tok.nom{animation:none}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.8rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+
+/* role card */
+.role{position:relative;overflow:hidden}
+.role.good{border-color:rgba(116,182,158,.45)} .role.burden{border-color:rgba(169,196,180,.35)}
+.role.minion,.role.demon{border-color:rgba(214,85,63,.55)}
+.role h2{font-size:2rem}
+.role .ab{font-size:1.02rem}
+.veil{border:1px dashed var(--line);border-radius:10px;padding:26px 12px;text-align:center;color:var(--muted)}
+
+.msgs{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.msg{border-left:3px solid var(--gold);background:var(--ink);border-radius:0 8px 8px 0;padding:8px 12px}
+.msg .when{font-size:.75rem;color:var(--muted);letter-spacing:.1em}
+.log{display:flex;flex-direction:column;gap:4px;max-height:260px;overflow:auto;font-size:.9rem}
+.log div{padding:3px 0;border-bottom:1px solid rgba(47,55,70,.6)}
+.log .t{color:var(--muted);font-size:.75rem;margin-right:8px;font-variant-numeric:tabular-nums}
+
+.picks{display:flex;flex-wrap:wrap;gap:6px}
+.pick{border:1px solid var(--line);background:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.pick.on{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);font-weight:700}
+
+.wake{border-color:var(--moon);box-shadow:0 0 0 1px rgba(185,195,214,.25),0 0 40px rgba(185,195,214,.08)}
+.vote-card{border-color:var(--cinna)}
+.vote-big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.vote-big b{font-family:var(--f-disp);font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums}
+
+.step{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--ink)}
+.step.dim{opacity:.55}
+.step-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ord{font-variant-numeric:tabular-nums;font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px}
+.hint{font-size:.85rem;color:var(--muted)}
+.status{font-size:.88rem;color:var(--moon)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--ink2);border-radius:999px;padding:2px 10px;font-size:.82rem;cursor:pointer}
+.chip.on{border-color:var(--gold);color:var(--gold)}
+
+.list{display:flex;flex-direction:column}
+.li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(47,55,70,.7);flex-wrap:wrap}
+.li:last-child{border-bottom:none}
+
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500;font-size:.8rem;letter-spacing:.08em}
+td.num{font-variant-numeric:tabular-nums;text-align:right}
+.scroll{overflow-x:auto}
+
+.alm{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.alm .item{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--ink);display:flex;flex-direction:column;gap:6px}
+.alm .item h3{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.rules{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.rules div{max-width:65ch}
+.rules b{font-family:var(--f-disp);color:var(--gold);display:block;margin-bottom:2px}
+
+.center{min-height:50vh;display:grid;place-items:center;text-align:center}
+.center .card{max-width:460px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--paper);color:var(--ink);padding:10px 16px;border-radius:10px;font-weight:500;max-width:calc(100vw - 32px);z-index:20;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.counter{display:flex;gap:10px;flex-wrap:wrap;font-size:.9rem}
+.counter span b{font-variant-numeric:tabular-nums}
+.warn{color:var(--cinna)}
+.ok{color:var(--jade)}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ============ 角色 ============ */
+const ROLES = [
+  {id:'guanxing',name:'觀星者',kind:'good',ability:'每夜選擇兩名玩家，得知他們是否屬於同一陣營。',st:'回答「同一陣營」或「不同陣營」。走火入魔者算魔道，千面客算正道。',first:30,other:30,picks:2,chips:['同一陣營','不同陣營']},
+  {id:'lingxi',name:'靈犀道侶',kind:'good',ability:'首夜，你得知一名正道玩家是誰、擔任什麼角色；他也會得知你的。',st:'挑一名正道玩家，分別私訊兩人對方的名字與角色。',first:20,picks:0},
+  {id:'cangjing',name:'藏經閣長老',kind:'good',ability:'首夜，你得知三個角色，其中恰好一個由在場的魔道玩家擔任。',st:'給一個在場的魔修或心魔角色，再混入兩個其他角色。',first:25,picks:0},
+  {id:'bugua',name:'卜卦師',kind:'good',ability:'每夜，你得知存活的魔道玩家（含心魔）人數是單數還是雙數。',st:'依你喚醒他當下的存活狀況回答。',first:40,other:40,picks:0,chips:['單數','雙數']},
+  {id:'liandan',name:'煉丹師',kind:'good',ability:'每夜（首夜除外）選擇一名其他玩家：今夜他不會被心魔所害。不能連續兩夜選同一人。',st:'記下被護的人。心魔若選中他，今夜無人因此隕落。',other:10,picks:1},
+  {id:'tianji',name:'天機閣弟子',kind:'good',ability:'每夜（首夜除外），你得知最近一名在夜裡隕落者的角色。',st:'昨夜沒人隕落就沿用更早的；從沒人在夜裡隕落則回答「尚無」。',other:50,picks:0},
+  {id:'wenxin',name:'問心鏡主',kind:'good',ability:'每當有玩家在白天被處決，當晚你得知他屬於正道還是魔道。',st:'今天沒有處決就不必喚醒。走火入魔者算魔道，千面客算正道。',other:45,picks:0,chips:['正道','魔道']},
+  {id:'xunye',name:'巡夜弟子',kind:'good',ability:'每夜選擇一名玩家：得知他今夜有沒有醒來行動；若有，得知他選了誰。',st:'最後喚醒他，依那名玩家今夜實際的選擇回答。',first:60,other:60,picks:1,chips:['今夜沒有醒來']},
+  {id:'huangu',name:'還骨師',kind:'good',ability:'每局一次，在夜裡選擇一名已隕落的玩家：他重獲生機，但從此失去能力。',st:'他可以選擇不用。救活後把那人改為存活，並在備註寫下「已無能力」。',other:55,picks:1,dead:true},
+  {id:'jianxiu',name:'劍修',kind:'good',ability:'每局一次，白天時你可以公開向一名玩家出劍：若他是心魔，心魔隕落；否則什麼都不會發生。',st:'由他當眾宣告，你在「公開宣告」公布結果。',picks:0},
+  {id:'shoushan',name:'守山弟子',kind:'good',ability:'你第一次在夜裡被心魔所害時，不會隕落。',st:'第一次被害時保留存活，在備註寫下「已擋一次」。',picks:0},
+  {id:'zhangmen',name:'掌門',kind:'good',ability:'你存活時，你的投票算作兩票。',st:'計票會自動把他算成兩票。',picks:0},
+  {id:'zouhuo',name:'走火入魔者',kind:'burden',ability:'你屬於正道，但所有查驗類能力都會把你當成魔道。',st:'觀星者、問心鏡主查到他時，一律當成魔道回答。',picks:0},
+  {id:'mengzhong',name:'夢中人',kind:'burden',ability:'每夜（首夜除外）你會夢見一名玩家的角色，但夢境大約有一半是假的。',st:'挑一名玩家，自行決定給真的或假的角色。',other:58,picks:0},
+  {id:'xiaoshimei',name:'小師妹',kind:'burden',ability:'若你在白天被處決，當晚心魔可以多害死一名玩家。',st:'當晚喚醒心魔時，把「選幾人」改成 2。',picks:0},
+  {id:'huoxin',name:'惑心使',kind:'minion',ability:'每夜選擇一名玩家：直到下一個夜晚，他的能力失效，說書人可以給他錯誤的資訊。',st:'在備註記下被惑的人，接下來給他的資訊可以是假的。',first:5,other:5,picks:1},
+  {id:'qianmian',name:'千面客',kind:'minion',ability:'查驗類能力會把你當成正道。首夜你額外得知三個不在場的正道角色，可以拿來偽裝。',st:'在「魔道相認」步驟按「送出偽裝身分」。',picks:0},
+  {id:'xueji',name:'血祭者',kind:'minion',ability:'若心魔隕落時仍有五名以上玩家存活，你立刻成為新的心魔。',st:'發生時把他的角色改成原本的心魔角色，並私訊通知他。',picks:0},
+  {id:'luanyan',name:'亂言者',kind:'minion',ability:'每個白天一次，你可以私下告訴說書人一名玩家：他今天的投票不計。',st:'他會私下告訴你；計票時把那人勾成「不計」。',picks:0},
+  {id:'shihun',name:'噬魂魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家：他隕落。',st:'被煉丹師保護或守山弟子第一次被害則不會隕落。',other:20,picks:1},
+  {id:'gumo',name:'蠱魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家種下魂蠱：他會在隔天白天結束時隕落，除非當天有人提名過他。',st:'天亮不宣告這個死亡。入夜前若被種蠱者當天沒被提名，就讓他隕落。',other:20,picks:1},
+  {id:'shuangsheng',name:'雙生魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家：他隕落。你第一次被處決時，若有魔修存活，改由一名魔修代你隕落。',st:'第一次被處決時，若還有魔修存活，宣布該魔修隕落，雙生魔留在場上。',other:20,picks:1},
+];
+const ROLE = Object.fromEntries(ROLES.map(r=>[r.id,r]));
+const KIND = {good:'正道',burden:'正道・負面',minion:'魔修',demon:'心魔'};
+const KIND_ORDER = ['good','burden','minion','demon'];
+const teamOf = id => {const k=ROLE[id]?.kind; return k==='minion'||k==='demon'?k:'good';};
+const evil = id => teamOf(id)!=='good';
+
+/* ============ 小工具 ============ */
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CN = n => {const d='〇一二三四五六七八九'; if(n<=0) return '〇'; if(n<10) return d[n]; if(n===10) return '十'; if(n<20) return '十'+d[n-10]; const t=Math.floor(n/10),u=n%10; return d[t]+'十'+(u?d[u]:'');};
+const rid = () => Math.random().toString(36).slice(2,10);
+const clone = o => JSON.parse(JSON.stringify(o));
+const shuffle = a => {a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;};
+const hhmm = t => {const d=new Date(t); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const recommend = n => {const m = n<=9?1:n<=12?2:3; return {minion:m,demon:1,good:Math.max(0,n-m-1)};};
+
+/* ============ 狀態 ============ */
+const S = {
+  db:null,user:null,me:null,owner:false,ready:false,slow:false,fatal:null,noWrite:false,
+  game:undefined,players:{},votes:{},secrets:{},actions:{},notes:{},myAction:null,
+  ui:{tab:'town',sel:null,reveal:false,picks:[],pool:[],assign:{},dawn:false,deaths:[],excl:[],confirm:null,rename:false},
+  d:{},
+};
+const G = () => S.game||{};
+const isLobby = () => G().status==='lobby';
+const tableSize = () => G().tableSize || Math.max(5, Object.keys(S.players).length);
+/* 候場時座位由玩家自選：每個玩家文件記 seat（座號）與 seatAt，同一座位先坐先得 */
+function claims(){
+  const n=tableSize(); const slot=Array(n).fill(null);
+  Object.entries(S.players)
+    .filter(([,p])=>Number.isInteger(p.seat)&&p.seat>=0&&p.seat<n)
+    .sort((a,b)=>(a[1].seatAt||0)-(b[1].seatAt||0))
+    .forEach(([pid,p])=>{ if(!slot[p.seat]) slot[p.seat]=pid; });
+  return slot;
+}
+const seats = () => isLobby() ? claims().filter(Boolean).map(id=>({id,alive:true,ghost:false})) : (G().seats||[]);
+const seatOf = pid => seats().find(s=>s.id===pid);
+const nm = pid => (S.players[pid]&&S.players[pid].name) || '無名氏';
+const roleOf = pid => {const s=S.secrets[pid]; return s && s.gid===G().gid ? s.role : null;};
+const living = () => seats().filter(s=>s.alive);
+const phaseLabel = g => !g ? '' : g.status==='lobby' ? '候場' : g.status==='ended' ? '終局' : g.phase==='night' ? `第${CN(g.round)}夜` : `第${CN(g.round)}日`;
+
+/* ============ 連線（房號＋密碼） ============ */
+const SESS_KEY='xuemoon_session';
+function loadSess(){try{return JSON.parse(localStorage.getItem(SESS_KEY)||'null');}catch(e){return null;}}
+function storeSess(s){try{ if(s) localStorage.setItem(SESS_KEY,JSON.stringify(s)); else localStorage.removeItem(SESS_KEY);}catch(e){}}
+let ES=null;
+const pend={game:0,notes:0,sec:{}};   // 說書人尚未送達伺服器的修改，避免被舊畫面蓋掉
+
+function boot(){
+  const s=loadSess();
+  if(s && s.code && s.token) connect(s); else render();
+}
+function connect(sess){
+  S.sess=sess; S.game=undefined; S.conn=false; render();
+  if(ES) ES.close();
+  ES = new EventSource(`/api/events?code=${encodeURIComponent(sess.code)}&token=${encodeURIComponent(sess.token)}`);
+  ES.addEventListener('state',e=>{
+    const v=JSON.parse(e.data);
+    S.conn=true; S.me=v.me; S.owner=v.isST; S.stOnline=v.stOnline;
+    S.players=v.players||{}; S.votes=v.votes||{};
+    if(v.isST){
+      if(!pend.game) S.game=v.game;
+      const sec=v.secrets||{}; for(const p in pend.sec){ if(pend.sec[p]>0 && S.secrets[p]) sec[p]=S.secrets[p]; } S.secrets=sec;
+      S.actions=v.actions||{}; if(!pend.notes) S.notes=v.notes||{};
+    } else { S.game=v.game; S.secrets=v.secrets||{}; S.myAction=v.myAction||null; }
+    render();
+  });
+  ES.addEventListener('kicked',()=>leave('你被說書人移出房間了。'));
+  ES.addEventListener('closed',()=>leave('說書人已關閉這個房間。'));
+  ES.onerror=()=>{
+    S.conn=false; render();
+    if(ES.readyState===2){ // 伺服器拒絕：房間不存在或憑證失效
+      fetch(`/api/events?code=${encodeURIComponent(sess.code)}&token=${encodeURIComponent(sess.token)}`,{method:'GET'})
+        .then(r=>{ if(r.status===401) leave('這個房間已經不存在了（伺服器可能重新啟動過），請重新建立或加入。'); else setTimeout(()=>connect(sess),3000); })
+        .catch(()=>setTimeout(()=>connect(sess),3000));
+    }
+  };
+}
+function leave(msg){
+  if(ES){ES.close(); ES=null;}
+  storeSess(null);
+  Object.assign(S,{sess:null,me:null,owner:false,game:undefined,players:{},votes:{},secrets:{},actions:{},notes:{},myAction:null,conn:false});
+  S.ui={...S.ui,tab:'town',sel:null,reveal:false,picks:[],pool:[],assign:{},dawn:false,deaths:[],excl:[],confirm:null,rename:false};
+  render(); if(msg) toast(msg);
+}
+async function api(path,body){
+  let r; try{ r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); }
+  catch(e){ throw new Error('連不上伺服器，請檢查網路。'); }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||'操作失敗');
+  return j;
+}
+function act(type,data){
+  return api('/api/act',{code:S.sess.code,token:S.sess.token,type,data:data||{}}).catch(e=>{toast(e.message); throw e;});
+}
+/* 說書人的修改依序送出 */
+const chains={};
+function queue(key,fn){ chains[key]=(chains[key]||Promise.resolve()).then(fn).catch(()=>{}); return chains[key]; }
+function saveGame(mut){
+  pend.game++;
+  return queue('game',()=>{const g=clone(S.game||{}); mut(g); S.game=g; render(); return act('setGame',{game:g});}).finally(()=>{pend.game--;});
+}
+function setSecret(pid,mut){
+  pend.sec[pid]=(pend.sec[pid]||0)+1;
+  return queue('s_'+pid,()=>{const s=clone(S.secrets[pid]||{}); mut(s); S.secrets[pid]=s; render(); return act('setSecret',{pid,secret:s});}).finally(()=>{pend.sec[pid]--;});
+}
+function saveNotes(){
+  pend.notes++;
+  return queue('notes',()=>act('setNotes',{notes:S.notes})).finally(()=>{pend.notes--;});
+}
+function logPush(g,text){g.log=(g.log||[]).concat({t:Date.now(),text}).slice(-80);}
+function sendMsg(pid,text,clearWake){
+  const g=G(); const tag = g.phase==='night' ? `第${CN(g.round)}夜` : g.phase==='day' ? `第${CN(g.round)}日` : '';
+  return setSecret(pid,s=>{s.msgs=(s.msgs||[]).concat({t:Date.now(),tag,text}).slice(-60); if(clearWake) s.wake=null;});
+}
+
+/* ============ 繪製 ============ */
+let rq=0;
+function render(){ if(rq) return; rq=requestAnimationFrame(()=>{rq=0; draw();}); }
+function draw(){
+  const app=document.getElementById('app');
+  const a=document.activeElement; const fid=a&&a.id; let ss=null,se=null;
+  try{ if(fid && a.selectionStart!=null){ss=a.selectionStart; se=a.selectionEnd;} }catch(e){}
+  app.innerHTML = view();
+  if(fid){const el=document.getElementById(fid); if(el){el.focus({preventScroll:true}); try{ if(ss!=null) el.setSelectionRange(ss,se);}catch(e){}}}
+}
+let tt=0;
+function toast(t){const el=document.getElementById('toast'); el.textContent=t; el.hidden=false; clearTimeout(tt); tt=setTimeout(()=>el.hidden=true,4200);}
+
+function view(){
+  if(!S.sess) return entryView();
+  if(S.game===undefined) return `<div class="center"><div class="card"><h2>正在進入房間 ${esc(S.sess.code)}…</h2><p class="muted">連線中，請稍候。</p><div class="row"><button class="btn sm ghost" data-act="leave">取消</button></div></div></div>`;
+  return S.owner ? stView() : playerView();
+}
+function entryView(){
+  const e=S.entry||{};
+  return `<div class="lobby-hero"><span class="seal">月</span><h1>血月鐘塔</h1><p>血月升起，鐘塔裡混進了心魔。輸入房號和密碼進入房間，或自己開一間當說書人。</p></div>
+  <div class="entry">
+    <form class="card" data-form="join"><h2>加入房間</h2>
+      <label class="field"><span>房號</span><input type="text" id="jCode" data-draft="jCode" inputmode="numeric" maxlength="4" placeholder="四位數字" value="${esc(S.d.jCode||'')}" autocomplete="off"></label>
+      <label class="field"><span>密碼</span><input type="text" id="jPw" data-draft="jPw" maxlength="32" placeholder="向說書人要" value="${esc(S.d.jPw||'')}" autocomplete="off"></label>
+      <label class="field"><span>你的暱稱</span><input type="text" id="jName" data-draft="jName" maxlength="12" placeholder="最多 12 個字" value="${esc(S.d.jName||'')}" autocomplete="nickname"></label>
+      <p class="err">${esc(e.join||'')}</p>
+      <button class="btn pri big" type="submit" ${e.busy?'disabled':''}>進入房間</button>
+    </form>
+    <form class="card" data-form="create"><h2>建立房間</h2>
+      <p class="muted small">建立的人就是說書人：負責發身分、主持夜晚和投票，自己不參與推理。</p>
+      <label class="field"><span>設定房間密碼</span><input type="text" id="cPw" data-draft="cPw" maxlength="32" placeholder="給朋友的密碼" value="${esc(S.d.cPw||'')}" autocomplete="off"></label>
+      <p class="err">${esc(e.create||'')}</p>
+      <button class="btn big" type="submit" ${e.busy?'disabled':''}>建立並當說書人</button>
+    </form>
+  </div>`;
+}
+function header(){
+  const g=S.game; const ph=phaseLabel(g);
+  const cls = !g?'':g.status==='ended'?'end':g.status==='playing'?g.phase:'';
+  const who = S.owner ? '說書人' : (S.players[S.me] ? esc(nm(S.me)) : '');
+  const leaveBtn = S.owner
+    ? (S.ui.confirm==='close' ? `<span class="small warn">關閉後所有人都會離開</span><button class="btn sm red" data-act="closeRoom">確定關閉</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button>` : `<button class="btn sm ghost" data-act="confirm" data-v="close">關閉房間</button>`)
+    : (S.ui.confirm==='leave' ? `<span class="small warn">離開後要重新輸入密碼加入</span><button class="btn sm red" data-act="leave">確定離開</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button>` : `<button class="btn sm ghost" data-act="confirm" data-v="leave">離開房間</button>`);
+  return `<header class="bar"><div class="brand"><span class="seal">月</span><div><h1>血月鐘塔</h1><p>房號 ${esc(S.sess.code)}・${who}</p></div></div>
+  <div class="roomchip">${!S.conn?'<span class="small warn">連線中斷，重新連線中…</span>':''}${!S.owner&&!S.stOnline?'<span class="small muted">說書人目前離線</span>':''}${ph?`<div class="phase ${cls}">${ph}</div>`:''}${leaveBtn}</div></header>`;
+}
+function inviteCard(){
+  return `<section class="card"><div class="card-h"><h3>邀請朋友</h3><span class="eyebrow">把這三樣告訴他們</span></div>
+  <div class="row"><span class="muted small">網址</span><b>${esc(location.origin)}</b></div>
+  <div class="row"><span class="muted small">房號</span><span class="code-big">${esc(S.sess.code)}</span></div>
+  <div class="row"><span class="muted small">密碼</span><b>${esc(S.sess.pw||'（建立房間時設定的密碼）')}</b></div>
+  <div class="row"><button class="btn sm" data-act="copyInvite">複製邀請訊息</button></div></section>`;
+}
+
+/* 圓桌 */
+function town(opts={}){
+  const g=G(); const lobby=isLobby();
+  const slots = lobby ? claims() : seats().map(s=>s.id);
+  const n=slots.length;
+  const vote=g.vote; const raised = vote ? Object.entries(S.votes).filter(([,v])=>v.vid===vote.id&&v.up).map(([p])=>p) : [];
+  const glyph = !g.status||g.status==='lobby' ? '候' : g.status==='ended' ? '終' : g.phase==='night' ? '夜' : '日';
+  const gcls = g.phase==='night'&&g.status==='playing' ? 'night' : 'day';
+  const sub = lobby ? `${slots.filter(Boolean).length} / ${n} 已入座` : g.status==='ended' ? (g.winner==='good'?'正道得勝':'魔道得勝') : `存活 ${living().length} / ${n}`;
+  const pct = n ? Math.min(19, 260/Math.max(n,1)) : 19;
+  const R = n<=6 ? 37 : 40;
+  const toks = slots.map((pid,i)=>{
+    const ang = (-90 + i*360/n) * Math.PI/180;
+    const x = 50 + R*Math.cos(ang), y = 50 + R*Math.sin(ang);
+    const pos = `left:${x}%;top:${y}%;width:${pct}%;font-size:${(pct*0.17).toFixed(2)}cqw`;
+    if(!pid){
+      const canSit = lobby && !S.owner && S.players[S.me] && !S.noWrite;
+      return canSit ? `<button class="tok empty" data-act="sit" data-i="${i}" style="${pos}" aria-label="坐到 ${i+1} 號空位"><span class="n">空位</span><span class="r">${i+1} 號</span></button>`
+                    : `<div class="tok empty" style="${pos}"><span class="n">空位</span><span class="r">${i+1} 號</span></div>`;
+    }
+    const s = lobby ? {id:pid,alive:true,ghost:false} : seatOf(pid);
+    let role = '';
+    if(opts.st){const r=roleOf(s.id); if(r) role=`<span class="r ${ROLE[r].kind}">${ROLE[r].name}</span>`;}
+    else if(g.reveal && g.reveal[s.id]){const r=g.reveal[s.id]; role=`<span class="r ${ROLE[r]?.kind||''}">${ROLE[r]?.name||''}</span>`;}
+    const cls = ['tok', s.id===S.me&&!S.owner?'me':'', !s.alive?'dead':'', vote&&vote.target===s.id?'nom':'', opts.st&&S.ui.sel===s.id?'sel':''].join(' ');
+    const mineLobby = lobby && !S.owner && s.id===S.me;
+    const tag = opts.st || mineLobby ? 'button' : 'div';
+    const act = opts.st ? ` data-act="sel" data-pid="${s.id}" aria-label="${esc(nm(s.id))}"` : mineLobby ? ` data-act="stand" aria-label="從 ${i+1} 號起身"` : '';
+    return `<${tag} class="${cls}"${act} style="${pos}">
+      ${!s.alive&&!s.ghost?'<span class="ghost" title="尚有殘魂票"></span>':''}
+      ${raised.includes(s.id)?'<span class="hand">舉</span>':''}
+      <span class="n">${esc(nm(s.id))}</span>${role}</${tag}>`;
+  }).join('');
+  return `<div class="town"><div class="town-c"><div><div class="glyph ${gcls}">${glyph}</div><div class="sub">${sub}</div></div></div>${toks}</div>
+  <div class="legend"><span><i style="background:var(--jade)"></i>殘魂票未用</span><span><i style="background:var(--blood)"></i>已隕落</span><span><i style="background:var(--gold)"></i>舉手中</span></div>`;
+}
+function logCard(){
+  const log=(G().log||[]).slice().reverse();
+  return `<section class="card"><div class="card-h"><h3>城中消息</h3><span class="eyebrow">公開</span></div>
+  <div class="log">${log.length?log.map(l=>`<div><span class="t">${hhmm(l.t)}</span>${esc(l.text)}</div>`).join(''):'<p class="muted small">還沒有消息。</p>'}</div></section>`;
+}
+
+/* ============ 弟子畫面 ============ */
+function playerView(){
+  const g=S.game;
+  if(!g) return header()+`<div class="center"><div class="card"><h2>遊戲桌還沒開</h2><p class="muted">等說書人建立遊戲桌後，這裡會自動更新。</p></div></div>`;
+  const me=S.players[S.me];
+  if(!me || S.ui.rename) return header()+joinView(me);
+  const tabs = `<nav class="tabs">${[['town','我的'],['rules','規則與角色']].map(([k,l])=>`<button class="tab ${S.ui.tab===k||(k==='town'&&S.ui.tab!=='rules')?'on':''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</nav>`;
+  if(S.ui.tab==='rules') return header()+tabs+rulesView();
+  const seated = !!seatOf(S.me);
+  return header()+tabs+`<div class="layout"><div class="col"><section class="card">${isLobby()||seats().length?town():'<p class="muted">還沒有人入座。</p>'}</section>${logCard()}</div>
+   <div class="col ${isLobby()?'':'first-m'}">   ${!seated?`<section class="card"><h3>${isLobby()?'選一個位子坐下':'本局已開始'}</h3><p class="muted">${isLobby()
+      ?`你已報名為「${esc(me.name)}」。點圓桌上任一個虛線空位就能入座，想換位子就點別的空位。`
+      :`你報名為「${esc(me.name)}」，但這一局開始時你不在座位上。可以先旁觀，下一局再入座。`}</p>
+      ${isLobby()&&Number.isInteger(me.seat)&&me.seat<tableSize()?'<p class="warn small">你選的位子被別人先坐走了，請換一個空位。</p>':''}
+      <div class="row"><button class="btn sm ghost" data-act="rename">改名字</button></div></section>`
+   :(isLobby()?`<section class="card"><h3>已入座：${claims().indexOf(S.me)+1} 號</h3><p class="muted small">點自己的座位可以起身，點別的空位可以換位子。等說書人開局。</p><div class="row"><button class="btn sm ghost" data-act="rename">改暱稱</button></div></section>`:'')+playerPanels()}</div></div>`;
+}
+function joinView(me){
+  return `<div class="center"><section class="card"><h2>${me?'改暱稱':'報名入座'}</h2>
+  <p class="muted">輸入你的暱稱（最多 12 個字），它會顯示在圓桌座位和城中消息裡。</p>
+  <form class="row" data-form="rename"><input type="text" id="joinName" data-draft="joinName" maxlength="12" placeholder="例如：阿明" value="${esc(S.d.joinName??(me?me.name:''))}" autocomplete="off">
+  <button class="btn pri" type="submit">${me?'儲存':'報名'}</button>${me?'<button class="btn ghost" type="button" data-act="cancelRename">取消</button>':''}</form></section></div>`;
+}
+function playerPanels(){
+  const g=G(); const sec=S.secrets[S.me]; const valid = sec && sec.gid===g.gid && g.status!=='lobby';
+  const out=[];
+  // 夜晚喚醒
+  if(valid && sec.wake && !(S.myAction && S.myAction.k===sec.wake.k) && g.status==='playing') out.push(wakePanel(sec.wake));
+  else if(valid && g.status==='playing' && g.phase==='night') out.push(`<section class="card"><h3>夜深了</h3><p class="muted">閉上眼睛，等說書人喚醒你。被喚醒時這裡會出現選擇。</p>${S.myAction&&sec.wake&&S.myAction.k===sec.wake.k?'<p class="ok small">你的選擇已送出。</p>':''}</section>`);
+  // 白天投票與提名
+  if(g.status==='playing' && g.phase==='day') out.push(dayPanel());
+  // 身分卡
+  out.push(roleCard(valid?sec.role:null));
+  // 私訊
+  const msgs = valid ? (sec.msgs||[]).slice().reverse() : [];
+  out.push(`<section class="card"><div class="card-h"><h3>說書人私訊</h3><span class="eyebrow">只有你看得到</span></div>
+    <div class="msgs">${msgs.length?msgs.map(m=>`<div class="msg"><div class="when">${esc(m.tag||'')} ${hhmm(m.t)}</div>${esc(m.text)}</div>`).join(''):'<p class="muted small">還沒有私訊。</p>'}</div></section>`);
+  return out.join('');
+}
+function roleCard(role){
+  const g=G();
+  if(!role) return `<section class="card"><h3>你的身分</h3><p class="muted">${g.status==='lobby'?'說書人開局後，你會在這裡拿到身分。':'這一局你沒有拿到身分，請問說書人。'}</p></section>`;
+  const r=ROLE[role];
+  return `<section class="card role ${r.kind}"><div class="card-h"><span class="eyebrow">你的身分</span><button class="btn sm ghost" data-act="reveal">${S.ui.reveal?'蓋上':'翻開'}</button></div>
+  ${S.ui.reveal?`<div class="row"><h2>${r.name}</h2><span class="tag ${r.kind}">${KIND[r.kind]}</span></div><p class="ab">${r.ability}</p>
+  <p class="small muted">${r.kind==='good'||r.kind==='burden'?'勝利條件：處決心魔。':'勝利條件：讓場上只剩兩名存活玩家，而心魔仍活著。'}</p>`
+  :`<div class="veil">按「翻開」查看身分。小心旁人偷看。</div>`}</section>`;
+}
+function wakePanel(w){
+  const pool = seats().filter(s=> w.dead ? !s.alive : s.alive);
+  const picks=S.ui.picks.filter(p=>pool.some(s=>s.id===p));
+  return `<section class="card wake"><div class="card-h"><h3>說書人喚醒了你</h3><span class="eyebrow">只有你看得到</span></div>
+  <p>${esc(w.prompt||'請做出選擇')}</p>
+  <div class="picks">${pool.map(s=>`<button class="pick ${picks.includes(s.id)?'on':''}" data-act="pick" data-pid="${s.id}" data-max="${w.picks}">${esc(nm(s.id))}</button>`).join('')||'<span class="muted small">沒有可選的玩家。</span>'}</div>
+  <div class="row"><button class="btn pri" data-act="submitPicks" ${picks.length===w.picks?'':'disabled'}>送出選擇（${picks.length}/${w.picks}）</button>
+  <button class="btn ghost" data-act="skipPicks">本夜不行動</button></div></section>`;
+}
+function dayPanel(){
+  const g=G(); const s=seatOf(S.me); const v=g.vote;
+  if(v){
+    const up = S.votes[S.me] && S.votes[S.me].vid===v.id && S.votes[S.me].up;
+    const canVote = s.alive || !s.ghost;
+    const raised = Object.entries(S.votes).filter(([,x])=>x.vid===v.id&&x.up).map(([p])=>nm(p));
+    return `<section class="card vote-card"><div class="card-h"><h3>審判進行中</h3><span class="tag minion">投票</span></div>
+    <p><b>${esc(nm(v.nominator))}</b> 提名了 <b>${esc(nm(v.target))}</b>。想處決他就舉手。</p>
+    ${canVote?`<button class="btn big ${up?'red':'pri'}" data-act="vote" data-up="${up?0:1}">${up?'放下手':'舉手'}</button>
+      ${!s.alive?'<p class="small muted">你已隕落，這次舉手會用掉你唯一的殘魂票（說書人結算時才算數）。</p>':''}`
+      :'<p class="muted">你的殘魂票已經用過了。</p>'}
+    <p class="small muted">目前舉手：${raised.length?raised.map(esc).join('、'):'無'}</p></section>`;
+  }
+  const already = (g.noms||[]).some(n=>n.day===g.round&&n.nominator===S.me);
+  const req = S.players[S.me].nom; const pending = req && req.gid===g.gid && req.day===g.round && !already;
+  if(!s.alive) return `<section class="card"><h3>白天</h3><p class="muted">你已隕落：可以繼續發言，但不能提名。</p></section>`;
+  if(already) return `<section class="card"><h3>白天</h3><p class="muted">你今天已經提名過了。</p></section>`;
+  const targets = seats().filter(x=>!(g.noms||[]).some(n=>n.day===g.round&&n.target===x.id));
+  return `<section class="card"><div class="card-h"><h3>提名</h3><span class="eyebrow">每天一次</span></div>
+  ${pending?`<p class="ok">你已提名 <b>${esc(nm(req.target))}</b>，等說書人開啟投票。</p>`:''}
+  <div class="row"><select id="nomT" data-draft="nomT"><option value="">選擇要提名的人</option>${targets.map(x=>`<option value="${x.id}" ${S.d.nomT===x.id?'selected':''}>${esc(nm(x.id))}${x.alive?'':'（已隕落）'}</option>`).join('')}</select>
+  <button class="btn pri" data-act="nominate">${pending?'改提名':'提名'}</button></div></section>`;
+}
+
+/* ============ 說書人畫面 ============ */
+function stView(){
+  const g=S.game;
+  if(!g) return header()+`<div class="center"><section class="card"><h2>建立遊戲桌</h2><p class="muted">你是這個頁面的擁有者，所以由你擔任說書人。建立後，把頁面分享給朋友（設為「編輯者」），他們打開就能報名入座。</p><button class="btn pri big" data-act="createTable">建立遊戲桌</button></section></div>`;
+  const tabsDef = [['town','圓桌'],['setup','配置'],['night','夜晚'],['day','白天'],['rules','規則']];
+  const tab = S.ui.tab;
+  const tabs = `<nav class="tabs">${tabsDef.map(([k,l])=>`<button class="tab ${tab===k?'on':''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</nav>`;
+  let body='';
+  if(tab==='setup') body=setupView();
+  else if(tab==='night') body=nightView();
+  else if(tab==='day') body=dayView();
+  else if(tab==='rules') body=rulesView();
+  else body=townView();
+  return header()+tabs+body;
+}
+function townView(){
+  const g=G(); const waiting = Object.keys(S.players).filter(p=>!seatOf(p));
+  return `<div class="layout"><div class="col"><section class="card">${isLobby()||seats().length?town({st:true}):`<p class="muted">還沒有人入座。</p>`}
+  <p class="small muted" style="text-align:center">${isLobby()?'玩家會自己點空位入座。點有人的座位可以查看或請他離座。':'點座位查看身分、改狀態或私訊。'}</p></section>
+  ${waiting.length?`<section class="card"><h3>${waiting.length} 人等待入座</h3><p class="small muted">${waiting.map(p=>esc(nm(p))).join('、')}</p><div class="row"><button class="btn sm" data-act="tab" data-tab="setup">前往配置</button></div></section>`:''}</div>
+  <div class="col">${S.ui.sel&&seatOf(S.ui.sel)?seatDetail(S.ui.sel):''}${isLobby()?inviteCard():''}${announceCard()}${g.status==='playing'?winCard():''}${g.status==='ended'?endCard():''}${logCard()}</div></div>`;
+}
+function seatDetail(pid){
+  const s=seatOf(pid); const r=roleOf(pid); const sec=S.secrets[pid]; const g=G();
+  const msgs = sec&&sec.gid===g.gid ? (sec.msgs||[]).slice(-4).reverse() : [];
+  return `<section class="card"><div class="card-h"><h3>${esc(nm(pid))}</h3><button class="btn sm ghost" data-act="sel" data-pid="">關閉</button></div>
+  ${g.status!=='lobby'?`<div class="row"><span class="muted small">身分</span><select id="role_${pid}" data-act-change="setRole" data-pid="${pid}">${roleOptions(r)}</select>${r?`<span class="tag ${ROLE[r].kind}">${KIND[ROLE[r].kind]}</span>`:''}</div>
+  ${r?`<p class="small">${ROLE[r].ability}</p>`:''}`:''}
+  ${isLobby()?`<div class="row"><span class="muted small">${claims().indexOf(pid)+1} 號座位</span><button class="btn sm" data-act="clearSeat" data-pid="${pid}">請他離座</button></div>`:`<div class="row"><button class="btn sm" data-act="toggleAlive" data-pid="${pid}">${s.alive?'設為隕落':'設為存活'}</button>
+  ${!s.alive?`<button class="btn sm" data-act="toggleGhost" data-pid="${pid}">${s.ghost?'殘魂票：已用（點擊恢復）':'殘魂票：未用（點擊標記已用）'}</button>`:''}</div>`}
+  <label class="stack"><span class="eyebrow">說書人備註（只有你看得到）</span><textarea id="note_${pid}" data-note="${pid}" placeholder="例如：被惑心、已擋一次">${esc(S.d['note_'+pid]??(S.notes[pid]||''))}</textarea></label>
+  <div class="row"><button class="btn sm" data-act="saveNote" data-pid="${pid}">儲存備註</button></div>
+  ${g.status!=='lobby'?`<label class="stack"><span class="eyebrow">私訊給他</span><textarea id="msg_${pid}" data-draft="msg_${pid}">${esc(S.d['msg_'+pid]||'')}</textarea></label>
+  <div class="row"><button class="btn pri sm" data-act="sendMsg" data-pid="${pid}">送出私訊</button></div>
+  ${msgs.length?`<div class="msgs">${msgs.map(m=>`<div class="msg"><div class="when">${esc(m.tag||'')} ${hhmm(m.t)}</div>${esc(m.text)}</div>`).join('')}</div>`:''}`:''}
+  </section>`;
+}
+function roleOptions(cur){
+  return `<option value="">（無）</option>`+KIND_ORDER.map(k=>`<optgroup label="${KIND[k]}">${ROLES.filter(r=>r.kind===k).map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${r.name}</option>`).join('')}</optgroup>`).join('');
+}
+function announceCard(){
+  return `<section class="card"><h3>公開宣告</h3><div class="row"><input type="text" id="ann" data-draft="ann" placeholder="例如：劍修出劍，什麼也沒發生" value="${esc(S.d.ann||'')}"><button class="btn" data-act="announce">發布</button></div></section>`;
+}
+function winCard(){
+  const c=S.ui.confirm;
+  return `<section class="card"><h3>結束本局</h3><p class="small muted">正道處決心魔即勝；只剩兩名存活玩家且心魔仍活著，魔道勝。</p>
+  ${c==='good'||c==='evil'?`<div class="row"><span>確定宣告 <b>${c==='good'?'正道':'魔道'}</b> 獲勝，並公開所有人身分？</span><button class="btn pri sm" data-act="win" data-team="${c}">確定</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button></div>`
+  :`<div class="row"><button class="btn sm" data-act="confirm" data-v="good">正道獲勝</button><button class="btn sm" data-act="confirm" data-v="evil">魔道獲勝</button></div>`}</section>`;
+}
+function endCard(){
+  return `<section class="card"><h3>${G().winner==='good'?'正道得勝':'魔道得勝'}</h3><p class="muted small">所有人的身分已公開在圓桌上。</p>
+  <div class="row"><button class="btn pri" data-act="newGame">再開一局（保留座位）</button></div></section>`;
+}
+
+/* 配置 */
+function setupView(){
+  const g=G(); const lobby = g.status==='lobby';
+  const waiting = Object.keys(S.players).filter(p=>!seatOf(p));
+  const n=seats().length; const rec=recommend(n);
+  const pool=S.ui.pool; const cnt={good:0,minion:0,demon:0}; pool.forEach(id=>cnt[teamOf(id)]++);
+  const assign=S.ui.assign; const acnt={good:0,minion:0,demon:0}; seats().forEach(s=>{if(assign[s.id]) acnt[teamOf(assign[s.id])]++;});
+  const allAssigned = n>0 && seats().every(s=>assign[s.id]);
+  return `<div class="layout"><div class="col">
+  ${lobby?inviteCard():''}
+  ${lobby?`<section class="card"><div class="card-h"><h3>圓桌座位數</h3><span class="eyebrow">${g.tableSize?'手動設定':'自動：依報名人數'}</span></div>
+  <div class="row"><button class="btn sm" data-act="tableSize" data-d="-1" aria-label="減少座位" ${tableSize()<=5?'disabled':''}>−</button>
+  <b style="font-size:1.4rem;min-width:2.5em;text-align:center;font-variant-numeric:tabular-nums">${tableSize()}</b>
+  <button class="btn sm" data-act="tableSize" data-d="1" aria-label="增加座位" ${tableSize()>=20?'disabled':''}>+</button>
+  ${g.tableSize?`<button class="btn sm ghost" data-act="tableSize" data-d="0">改回自動</button>`:''}</div>
+  <p class="small muted">座位數預設等於報名人數（至少 5 個），有人報名就自動多一個空位。玩家在圓桌上點空位自行入座。</p></section>`:''}
+  <section class="card"><div class="card-h"><h3>報名但未入座</h3>${lobby&&waiting.length?`<button class="btn sm" data-act="fillSeats">幫他們隨機入座</button>`:''}</div>
+  ${waiting.length?`<div class="list">${waiting.map(p=>`<div class="li"><span><span class="dot ${S.players[p].on?'on':''}"></span> ${esc(nm(p))}</span><span class="row"><button class="btn sm ghost" data-act="kick" data-pid="${p}">移除報名</button></span></div>`).join('')}</div>`
+  :`<p class="muted small">${Object.keys(S.players).length?'所有報名的人都已入座。':'還沒有人進房。把網址、房號和密碼告訴朋友，他們輸入後再點圓桌上的空位就能入座。'}</p>`}</section>
+  <section class="card"><div class="card-h"><h3>座位表</h3><span class="eyebrow">${n} 人・順時針</span></div>
+  ${n?`<div class="list">${seats().map((s,i)=>`<div class="li"><span><span class="muted small">${lobby?claims().indexOf(s.id)+1:i+1} 號</span> <span class="dot ${S.players[s.id]&&S.players[s.id].on?'on':''}" title="${S.players[s.id]&&S.players[s.id].on?'在線':'離線'}"></span> ${esc(nm(s.id))}</span><span class="row">
+    ${lobby?`<select id="as_${s.id}" data-act-change="assign" data-pid="${s.id}" aria-label="${esc(nm(s.id))} 的角色">${roleOptions(assign[s.id]||'')}</select>
+      <button class="btn sm ghost" data-act="clearSeat" data-pid="${s.id}">請他離座</button>`
+    :`<button class="btn sm ghost" data-act="seatMove" data-i="${i}" data-d="-1" aria-label="上移" ${i===0?'disabled':''}>↑</button>
+      <button class="btn sm ghost" data-act="seatMove" data-i="${i}" data-d="1" aria-label="下移" ${i===n-1?'disabled':''}>↓</button>`}</span></div>`).join('')}</div>`:'<p class="muted small">還沒有人入座。</p>'}
+  </section></div>
+  <div class="col">${lobby?`
+  <section class="card"><div class="card-h"><h3>挑選本局角色</h3><span class="eyebrow">角色池</span></div>
+  <p class="small muted">${n<5?'至少 5 人才能開局。':`${n} 人建議：正道 ${rec.good}、魔修 ${rec.minion}、心魔 1。正道裡可放 0 到 2 個負面角色增加變數。`}</p>
+  <div class="counter"><span>已選 <b>${pool.length}</b> / ${n}</span><span class="${cnt.good===rec.good?'ok':''}">正道 <b>${cnt.good}</b></span><span class="${cnt.minion===rec.minion?'ok':''}">魔修 <b>${cnt.minion}</b></span><span class="${cnt.demon===1?'ok':'warn'}">心魔 <b>${cnt.demon}</b></span></div>
+  ${KIND_ORDER.map(k=>`<div class="stack"><span class="eyebrow">${KIND[k]}</span><div class="chips">${ROLES.filter(r=>r.kind===k).map(r=>`<button class="chip ${pool.includes(r.id)?'on':''}" data-act="poolToggle" data-role="${r.id}" title="${esc(r.ability)}">${r.name}</button>`).join('')}</div></div>`).join('')}
+  <div class="row"><button class="btn" data-act="autoPool" ${n<5?'disabled':''}>依人數隨機挑角色</button><button class="btn pri" data-act="randomAssign" ${pool.length===n&&n>=5?'':'disabled'}>把角色池隨機發給座位</button></div>
+  </section>
+  <section class="card"><h3>開局</h3>
+  <div class="counter"><span>已分配 <b>${Object.keys(assign).filter(p=>seatOf(p)&&assign[p]).length}</b> / ${n}</span><span>正道 <b>${acnt.good}</b></span><span>魔修 <b>${acnt.minion}</b></span><span class="${acnt.demon===1?'ok':'warn'}">心魔 <b>${acnt.demon}</b></span></div>
+  <p class="small muted">可以先隨機發，再在左邊座位旁的選單手動調整。開局後，每位玩家只會在自己的手機上看到自己的身分。</p>
+  <div class="row"><button class="btn pri big" data-act="startGame" ${allAssigned&&acnt.demon>=1&&n>=5?'':'disabled'}>開局，進入第一夜</button></div></section>`
+  :`<section class="card"><h3>本局進行中</h3><p class="muted small">角色已發出。要調整某人的身分，到「圓桌」點他的座位。座位順序仍可以調整。</p>
+  ${S.ui.confirm==='reset'?`<div class="row"><span class="warn">確定放棄這一局、回到配置？</span><button class="btn red sm" data-act="newGame">確定</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button></div>`:`<div class="row"><button class="btn sm ghost" data-act="confirm" data-v="reset">放棄本局，重新配置</button></div>`}</section>`}
+  </div></div>`;
+}
+
+/* 夜晚 */
+function nightSteps(){
+  const g=G(); const first=g.round===1; const steps=[];
+  if(first) steps.push({key:'evil',order:1});
+  seats().forEach(s=>{const r=roleOf(s.id); if(!r) return; const o = first ? ROLE[r].first : ROLE[r].other; if(o!=null) steps.push({key:s.id,order:o,pid:s.id,role:r});});
+  return steps.sort((a,b)=>a.order-b.order);
+}
+function nightView(){
+  const g=G();
+  if(g.status!=='playing') return `<section class="card"><p class="muted">開局後才有夜晚流程。</p></section>`;
+  if(g.phase!=='night') return `<section class="card"><h3>現在是白天</h3><p class="muted">到「白天」主持提名與投票，結束後按「入夜」。</p><div class="row"><button class="btn" data-act="tab" data-tab="day">前往白天</button></div></section>`;
+  const steps=nightSteps();
+  return `<div class="layout"><div class="col"><section class="card"><div class="card-h"><h3>第${CN(g.round)}夜・喚醒順序</h3><span class="eyebrow">由上而下</span></div>
+  <p class="small muted">請大家閉眼。依序「喚醒」需要選擇的人，等他在手機上送出，再把結果寫進私訊送出。只給資訊的角色直接送私訊即可。</p>
+  ${steps.length?steps.map(stepCard).join(''):'<p class="muted">今夜沒有需要喚醒的角色。</p>'}</section></div>
+  <div class="col">${dawnCard()}<section class="card">${town({st:true})}</section></div></div>`;
+}
+function evilStep(){
+  const ev=seats().filter(s=>evil(roleOf(s.id)));
+  const demon=ev.filter(s=>teamOf(roleOf(s.id))==='demon'); const mins=ev.filter(s=>teamOf(roleOf(s.id))==='minion');
+  const qm=seats().filter(s=>roleOf(s.id)==='qianmian');
+  return `<article class="step"><div class="step-h"><span class="ord">1</span><b>魔道相認</b></div>
+  <p class="hint">心魔：${demon.map(s=>esc(nm(s.id))).join('、')||'無'}；魔修：${mins.map(s=>esc(nm(s.id))).join('、')||'無'}。按下後，每位魔道玩家會收到同伴名單。</p>
+  <div class="row"><button class="btn sm pri" data-act="sendEvil">送出相認資訊</button>${qm.length?`<button class="btn sm" data-act="sendBluffs">送出千面客的偽裝身分</button>`:''}</div></article>`;
+}
+function stepCard(st){
+  if(st.key==='evil') return evilStep();
+  const pid=st.pid, r=ROLE[st.role], sec=S.secrets[pid], s=seatOf(pid);
+  const wake = sec && sec.wake; const act=S.actions[pid]; const answered = wake && act && act.k===wake.k;
+  const picksTxt = answered ? (act.picks.length ? '選擇了：'+act.picks.map(nm).join('、') : '選擇本夜不行動') : wake ? '已喚醒，等待他選擇…' : '';
+  const note = S.notes[pid];
+  return `<article class="step ${s.alive||r.id==='huangu'?'':'dim'}">
+  <div class="step-h"><span class="ord">${st.order}</span><b>${esc(nm(pid))}</b><span class="tag ${r.kind}">${r.name}</span>${s.alive?'':'<span class="tag dead">已隕落</span>'}${note?`<span class="tag">${esc(note)}</span>`:''}</div>
+  <p class="small">${r.ability}</p><p class="hint">說書提示：${r.st}</p>
+  ${r.picks?`<div class="row"><label class="row small">選<input type="number" id="pk_${pid}" data-draft="pk_${pid}" min="1" max="6" value="${esc(S.d['pk_'+pid]??r.picks)}">人</label>
+    <button class="btn sm" data-act="wake" data-pid="${pid}">${wake?'重新喚醒':'喚醒並請他選擇'}</button>${wake?`<span class="status">${esc(picksTxt)}</span>`:''}</div>`:''}
+  ${r.chips?`<div class="chips">${r.chips.map(c=>`<button class="chip" data-act="chipMsg" data-pid="${pid}" data-text="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}
+  <textarea id="msg_${pid}" data-draft="msg_${pid}" placeholder="要告訴他的資訊">${esc(S.d['msg_'+pid]||'')}</textarea>
+  <div class="row"><button class="btn sm pri" data-act="sendMsg" data-pid="${pid}" data-clear="1">送出資訊</button></div></article>`;
+}
+function dawnCard(){
+  const g=G();
+  if(!S.ui.dawn) return `<section class="card"><h3>天亮</h3><p class="small muted">夜晚行動都處理完後，選出今夜隕落的人並公布。</p><div class="row"><button class="btn pri" data-act="dawn">準備天亮</button></div></section>`;
+  return `<section class="card"><h3>今夜隕落的人</h3><p class="small muted">勾選要公布死亡的人，不勾就是平安夜。蠱魔種下的蠱不要在這裡勾。</p>
+  <div class="picks">${living().map(s=>`<button class="pick ${S.ui.deaths.includes(s.id)?'on':''}" data-act="deathToggle" data-pid="${s.id}">${esc(nm(s.id))}</button>`).join('')}</div>
+  <div class="row"><button class="btn pri" data-act="confirmDawn">公布並進入白天</button><button class="btn ghost" data-act="cancelDawn">返回</button></div></section>`;
+}
+
+/* 白天 */
+function tally(){
+  const v=G().vote; if(!v) return {voters:[],count:0};
+  const voters=[];
+  Object.entries(S.votes).forEach(([pid,x])=>{
+    if(x.vid!==v.id||!x.up) return; const s=seatOf(pid); if(!s) return; if(!s.alive&&s.ghost) return;
+    const ex=S.ui.excl.includes(pid); const w = ex?0 : (s.alive&&roleOf(pid)==='zhangmen')?2:1;
+    voters.push({pid,w,ex,dead:!s.alive});
+  });
+  return {voters,count:voters.reduce((a,b)=>a+b.w,0)};
+}
+function dayView(){
+  const g=G();
+  if(g.status!=='playing') return `<section class="card"><p class="muted">開局後才有白天流程。</p></section>`;
+  if(g.phase!=='day') return `<section class="card"><h3>現在是夜晚</h3><p class="muted">到「夜晚」處理行動，然後按「準備天亮」。</p><div class="row"><button class="btn" data-act="tab" data-tab="night">前往夜晚</button></div></section>`;
+  const th=Math.ceil(living().length/2);
+  const today=(g.noms||[]).filter(n=>n.day===g.round);
+  const max=today.reduce((m,n)=>Math.max(m,n.count),0);
+  const top=today.filter(n=>n.count===max&&max>=th);
+  const executed = g.executed && g.executed.day===g.round;
+  const nominated = new Set(today.map(n=>n.target)); const nominators=new Set(today.map(n=>n.nominator));
+  const reqs = Object.entries(S.players).filter(([p,x])=>x.nom&&x.nom.gid===g.gid&&x.nom.day===g.round&&!nominators.has(p)&&seatOf(p)&&!(g.vote&&g.vote.nominator===p));
+  let voteCard='';
+  if(g.vote){
+    const t=tally();
+    voteCard=`<section class="card vote-card"><div class="card-h"><h3>投票中：${esc(nm(g.vote.nominator))} → ${esc(nm(g.vote.target))}</h3></div>
+    <div class="vote-big"><b>${t.count}</b><span class="muted">票，處決門檻 ${th} 票（存活 ${living().length} 人的一半，無條件進位）</span></div>
+    <div class="list">${t.voters.length?t.voters.map(v=>`<div class="li"><span>${esc(nm(v.pid))}${v.dead?' <span class="tag dead">殘魂票</span>':''}${v.w===2?' <span class="tag good">掌門×2</span>':''}</span><button class="btn sm ghost" data-act="excl" data-pid="${v.pid}">${v.ex?'恢復計票':'此票不計'}</button></div>`).join(''):'<p class="muted small">還沒有人舉手。</p>'}</div>
+    <div class="row"><button class="btn pri" data-act="closeVote">結束投票並記錄</button><button class="btn ghost" data-act="cancelVote">取消這次投票</button></div></section>`;
+  }
+  return `<div class="layout"><div class="col">${voteCard}
+  <section class="card"><div class="card-h"><h3>提名請求</h3><span class="eyebrow">玩家送出</span></div>
+  ${reqs.length?`<div class="list">${reqs.map(([p,x])=>`<div class="li"><span>${esc(nm(p))} 提名 <b>${esc(nm(x.nom.target))}</b>${nominated.has(x.nom.target)?' <span class="tag">此人今天已被提名</span>':''}</span><button class="btn sm pri" data-act="startVote" data-n="${p}" data-t="${x.nom.target}" ${g.vote||nominated.has(x.nom.target)?'disabled':''}>開始投票</button></div>`).join('')}</div>`:'<p class="muted small">目前沒有提名請求。</p>'}
+  <div class="row"><select id="mN" data-draft="mN"><option value="">提名者</option>${living().filter(s=>!nominators.has(s.id)).map(s=>`<option value="${s.id}" ${S.d.mN===s.id?'selected':''}>${esc(nm(s.id))}</option>`).join('')}</select>
+  <select id="mT" data-draft="mT"><option value="">被提名者</option>${seats().filter(s=>!nominated.has(s.id)).map(s=>`<option value="${s.id}" ${S.d.mT===s.id?'selected':''}>${esc(nm(s.id))}</option>`).join('')}</select>
+  <button class="btn sm" data-act="manualVote" ${g.vote?'disabled':''}>代為提名並投票</button></div></section>
+  <section class="card"><div class="card-h"><h3>今日審判紀錄</h3><span class="eyebrow">門檻 ${th}</span></div>
+  ${today.length?`<div class="scroll"><table><thead><tr><th>提名者</th><th>被提名者</th><th>票數</th><th></th></tr></thead><tbody>${today.map(n=>`<tr><td>${esc(nm(n.nominator))}</td><td>${esc(nm(n.target))}</td><td class="num">${n.count}</td><td>${n.count>=th?'<span class="tag minion">達門檻</span>':''}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted small">今天還沒有投票。</p>'}
+  <p class="small">${executed?`今天已處決 <b>${esc(nm(g.executed.pid))}</b>。`:top.length===1?`處決候選：<b>${esc(nm(top[0].target))}</b>（${max} 票）`:top.length>1?'最高票平手，今天不處決。':'目前沒有人達到門檻。'}</p>
+  <div class="row">${!executed&&top.length===1?`<button class="btn red" data-act="execute" data-pid="${top[0].target}">處決 ${esc(nm(top[0].target))}</button>`:''}
+  <button class="btn pri" data-act="toNight" ${g.vote?'disabled':''}>入夜</button></div></section></div>
+  <div class="col"><section class="card">${town({st:true})}</section>${announceCard()}</div></div>`;
+}
+
+/* 規則 */
+function rulesView(){
+  return `<div class="col"><section class="card"><h2>怎麼玩</h2><div class="rules">
+  <div><b>兩個陣營</b>正道弟子裡混進了魔修，背後是一隻心魔。正道要在白天找出並處決心魔；魔道要撐到場上只剩兩名存活玩家，而心魔仍活著。</div>
+  <div><b>夜晚</b>所有人閉眼。說書人依序喚醒有能力的人，被喚醒的人在自己手機上選擇目標，再從私訊收到資訊。中了惑心的人可能收到錯誤資訊。</div>
+  <div><b>白天</b>天亮公布昨夜隕落的人，接著自由討論、私下密談。每名存活玩家每天可以提名一次，每名玩家每天只能被提名一次。</div>
+  <div><b>投票</b>說書人開啟投票後，想處決被提名者的人舉手。票數要達到存活人數的一半（無條件進位）才有效。當天最高票者被處決，最高票平手就不處決。每天最多處決一人。</div>
+  <div><b>隕落之後</b>隕落的人還能發言，但不能提名。整局只剩一張殘魂票，用掉就沒了。</div>
+  <div><b>說話自由</b>你可以說真話，也可以說謊。身分卡只有自己看得到，要不要公開、公開成什麼，由你決定。</div>
+  </div></section>
+  <section class="card"><h2>角色圖鑑</h2><div class="alm">${ROLES.map(r=>`<div class="item"><h3>${r.name}<span class="tag ${r.kind}">${KIND[r.kind]}</span></h3><p class="small">${r.ability}</p></div>`).join('')}</div></section></div>`;
+}
+
+/* ============ 互動 ============ */
+const ACT = {
+  tab:d=>{S.ui.tab=d.tab; S.ui.confirm=null; render(); window.scrollTo({top:0});},
+  sel:d=>{S.ui.sel=d.pid||null; render();},
+  reveal:()=>{S.ui.reveal=!S.ui.reveal; render();},
+  rename:()=>{S.ui.rename=true; S.d.joinName=S.players[S.me]?.name||''; render();},
+  cancelRename:()=>{S.ui.rename=false; render();},
+  confirm:d=>{S.ui.confirm=d.v||null; render();},
+
+  // 玩家
+  pick:d=>{const p=S.ui.picks; const max=+d.max; const i=p.indexOf(d.pid); if(i>=0) p.splice(i,1); else {if(max===1) p.length=0; else if(p.length>=max) p.shift(); p.push(d.pid);} render();},
+  submitPicks:()=>{const w=S.secrets[S.me].wake; const picks=S.ui.picks.slice(); act('pick',{k:w.k,picks}).then(()=>{S.ui.picks=[]; toast('已送出，閉上眼睛吧。');},()=>{});},
+  skipPicks:()=>{const w=S.secrets[S.me].wake; act('pick',{k:w.k,picks:[]}).then(()=>{S.ui.picks=[]; toast('已告知說書人你本夜不行動。');},()=>{});},
+  nominate:()=>{const t=S.d.nomT; if(!t){toast('先選擇要提名的人。'); return;} act('nominate',{target:t}).then(()=>toast('已送出提名，等說書人開啟投票。'),()=>{});},
+  leave:()=>leave(),
+  closeRoom:()=>{S.ui.confirm=null; act('closeRoom').then(()=>leave('房間已關閉。'),()=>{});},
+  copyInvite:()=>{const t=`來玩血月鐘塔！\n網址：${location.origin}\n房號：${S.sess.code}\n密碼：${S.sess.pw||''}`;
+    try{ navigator.clipboard.writeText(t).then(()=>toast('已複製，貼給朋友吧。'),()=>toast('無法自動複製，請手動抄下房號和密碼。')); }catch(e){ toast('無法自動複製，請手動抄下房號和密碼。'); }},
+  sit:d=>{const i=+d.i; if(!isLobby()) return; if(claims()[i]){toast('這個位子有人了，換一個吧。'); return;}
+    const me=clone(S.players[S.me]); me.seat=i; me.seatAt=Date.now();
+    act('sit',{i}).then(()=>toast(`已坐到 ${i+1} 號。`),()=>{});},
+  stand:()=>{act('stand').then(()=>toast('你已起身。'),()=>{});},
+  vote:d=>{const v=G().vote; if(!v) return; act('vote',{up:d.up==='1'}).catch(()=>{});},
+
+  // 說書人：遊戲桌
+  seatMove:d=>saveGame(g=>{const i=+d.i,j=i+(+d.d); if(j<0||j>=g.seats.length) return; [g.seats[i],g.seats[j]]=[g.seats[j],g.seats[i]];}),
+  tableSize:d=>{const dd=+d.d; saveGame(g=>{ if(dd===0){g.tableSize=null; return;} const cur=g.tableSize||Math.max(5,Object.keys(S.players).length); g.tableSize=Math.max(5,Math.min(20,cur+dd)); });},
+  clearSeat:d=>{const p=clone(S.players[d.pid]||{}); p.seat=null; if(S.ui.sel===d.pid) S.ui.sel=null; delete S.ui.assign[d.pid]; act('clearSeat',{pid:d.pid}).catch(()=>{});},
+  fillSeats:()=>{const slot=claims(); const empty=shuffle(slot.map((x,i)=>x?null:i).filter(i=>i!==null));
+    const waiting=shuffle(Object.keys(S.players).filter(p=>!slot.includes(p)));
+    if(!empty.length){toast('沒有空位了，先增加座位數。'); return;}
+    waiting.slice(0,empty.length).forEach((p,k)=>{queue('seats',()=>act('setSeat',{pid:p,i:empty[k]}));});
+    if(waiting.length>empty.length) toast(`空位不夠，還有 ${waiting.length-empty.length} 人沒位子。`);},
+  kick:d=>{act('kick',{pid:d.pid}).then(()=>toast('已移除。'),()=>{});},
+  poolToggle:d=>{const p=S.ui.pool; const i=p.indexOf(d.role); if(i>=0) p.splice(i,1); else p.push(d.role); render();},
+  autoPool:()=>{const n=seats().length; const rec=recommend(n);
+    const demon=shuffle(ROLES.filter(r=>r.kind==='demon'))[0];
+    const mins=shuffle(ROLES.filter(r=>r.kind==='minion')).slice(0,rec.minion);
+    const burdenN=Math.min(n>=8?1:0, rec.good); const burdens=shuffle(ROLES.filter(r=>r.kind==='burden')).slice(0,burdenN);
+    const goods=shuffle(ROLES.filter(r=>r.kind==='good')).slice(0,rec.good-burdenN);
+    S.ui.pool=[demon,...mins,...burdens,...goods].map(r=>r.id); render();},
+  randomAssign:()=>{const p=shuffle(S.ui.pool); S.ui.assign={}; seats().forEach((s,i)=>S.ui.assign[s.id]=p[i]); render(); toast('已隨機分配，可以在座位旁手動調整。');},
+  startGame:()=>{
+    const gid=rid(); const list=seats();
+    list.forEach(s=>{const role=S.ui.assign[s.id]; setSecret(s.id,x=>{x.gid=gid; x.role=role; x.msgs=[]; x.wake=null;});});
+    S.notes={}; saveNotes();
+    saveGame(g=>{g.status='playing'; g.phase='night'; g.round=1; g.gid=gid; g.noms=[]; g.vote=null; g.executed=null; g.winner=null; g.reveal=null; g.seats=list.map(s=>({id:s.id,alive:true,ghost:false})); logPush(g,`新的一局開始，共 ${list.length} 人。第一夜降臨。`);});
+    S.ui.tab='night'; S.ui.dawn=false; S.ui.deaths=[]; render();
+  },
+  newGame:()=>{S.ui.confirm=null; S.ui.assign={}; saveGame(g=>{g.status='lobby'; g.phase='setup'; g.round=0; g.vote=null; g.noms=[]; g.executed=null; g.reveal=null; g.winner=null; g.seats=g.seats.map(s=>({id:s.id,alive:true,ghost:false})); logPush(g,'回到候場，準備下一局。');}); S.ui.tab='setup'; render();},
+
+  // 說書人：座位
+  toggleAlive:d=>saveGame(g=>{const s=g.seats.find(x=>x.id===d.pid); s.alive=!s.alive; if(s.alive) s.ghost=false;}),
+  toggleGhost:d=>saveGame(g=>{const s=g.seats.find(x=>x.id===d.pid); s.ghost=!s.ghost;}),
+  saveNote:d=>{const v=S.d['note_'+d.pid]; if(v!=null) S.notes[d.pid]=v; saveNotes().then(()=>toast('備註已儲存。'));},
+  sendMsg:d=>{const t=(S.d['msg_'+d.pid]||'').trim(); if(!t){toast('先寫下要傳的內容。'); return;} S.d['msg_'+d.pid]=''; sendMsg(d.pid,t,d.clear==='1').then(()=>toast('已私訊 '+nm(d.pid)+'。'));},
+  chipMsg:d=>{const k='msg_'+d.pid; S.d[k]=(S.d[k]?S.d[k]+'；':'')+d.text; render();},
+  announce:()=>{const t=(S.d.ann||'').trim(); if(!t) return; S.d.ann=''; saveGame(g=>logPush(g,t));},
+  win:d=>{S.ui.confirm=null; const rev={}; seats().forEach(s=>{const r=roleOf(s.id); if(r) rev[s.id]=r;}); saveGame(g=>{g.status='ended'; g.winner=d.team; g.reveal=rev; g.vote=null; logPush(g,(d.team==='good'?'心魔伏誅，正道得勝！':'心魔得逞，魔道得勝！')+' 所有身分已公開。');}); S.ui.tab='town'; render();},
+
+  // 說書人：夜晚
+  wake:d=>{const r=ROLE[roleOf(d.pid)]; const n=Math.max(1,Math.min(6,parseInt(S.d['pk_'+d.pid]??r.picks,10)||r.picks));
+    const prompt = r.dead ? `選擇 ${n} 名已隕落的玩家讓他重獲生機，或選擇本夜不行動。` : `${r.name}，請選擇 ${n} 名玩家。`;
+    setSecret(d.pid,s=>{s.wake={k:rid(),picks:n,prompt,dead:!!r.dead};}).then(()=>toast('已喚醒 '+nm(d.pid)+'。'));},
+  sendEvil:()=>{const ev=seats().filter(s=>evil(roleOf(s.id)));
+    const demon=ev.filter(s=>teamOf(roleOf(s.id))==='demon').map(s=>nm(s.id)); const mins=ev.filter(s=>teamOf(roleOf(s.id))==='minion').map(s=>nm(s.id));
+    const text=`魔道相認：心魔是 ${demon.join('、')||'（無）'}；魔修是 ${mins.join('、')||'（無）'}。`;
+    ev.forEach(s=>sendMsg(s.id,text,false)); toast('已送出相認資訊給 '+ev.length+' 人。');},
+  sendBluffs:()=>{const inPlay=new Set(seats().map(s=>roleOf(s.id)));
+    const pool=shuffle(ROLES.filter(r=>(r.kind==='good')&&!inPlay.has(r.id))).slice(0,3).map(r=>r.name);
+    seats().filter(s=>roleOf(s.id)==='qianmian').forEach(s=>sendMsg(s.id,'可用來偽裝的正道角色（都不在場）：'+pool.join('、'),false));
+    toast('已送出偽裝身分：'+pool.join('、'));},
+  dawn:()=>{S.ui.dawn=true; S.ui.deaths=[]; render();},
+  cancelDawn:()=>{S.ui.dawn=false; render();},
+  deathToggle:d=>{const a=S.ui.deaths; const i=a.indexOf(d.pid); if(i>=0) a.splice(i,1); else a.push(d.pid); render();},
+  confirmDawn:()=>{const dead=S.ui.deaths.slice(); S.ui.dawn=false; S.ui.deaths=[];
+    seats().forEach(s=>{const sec=S.secrets[s.id]; if(sec&&sec.wake) setSecret(s.id,x=>{x.wake=null;});});
+    saveGame(g=>{dead.forEach(p=>{const s=g.seats.find(x=>x.id===p); if(s) s.alive=false;}); g.phase='day'; g.vote=null; g.executed=null;
+      logPush(g,`第${CN(g.round)}日天亮。`+(dead.length?`昨夜 ${dead.map(nm).join('、')} 隕落。`:'昨夜平安無事。'));});
+    S.ui.tab='day'; render();},
+
+  // 說書人：白天
+  startVote:d=>startVote(d.n,d.t),
+  manualVote:()=>{if(!S.d.mN||!S.d.mT){toast('請選擇提名者與被提名者。'); return;} startVote(S.d.mN,S.d.mT); S.d.mN=''; S.d.mT='';},
+  excl:d=>{const a=S.ui.excl; const i=a.indexOf(d.pid); if(i>=0) a.splice(i,1); else a.push(d.pid); render();},
+  cancelVote:()=>{S.ui.excl=[]; saveGame(g=>{g.vote=null;});},
+  closeVote:()=>{const t=tally(); S.ui.excl=[]; saveGame(g=>{const v=g.vote; if(!v) return;
+      g.noms=(g.noms||[]).concat({day:g.round,nominator:v.nominator,target:v.target,count:t.count,voters:t.voters.filter(x=>!x.ex).map(x=>x.pid)});
+      t.voters.filter(x=>x.dead&&!x.ex).forEach(x=>{const s=g.seats.find(y=>y.id===x.pid); if(s) s.ghost=true;});
+      g.vote=null; logPush(g,`${nm(v.nominator)} 提名 ${nm(v.target)}，得 ${t.count} 票。`);});},
+  execute:d=>saveGame(g=>{const s=g.seats.find(x=>x.id===d.pid); if(s) s.alive=false; g.executed={day:g.round,pid:d.pid}; logPush(g,`${nm(d.pid)} 被處決。`);}),
+  toNight:()=>{saveGame(g=>{g.phase='night'; g.round=(g.round||0)+1; g.vote=null; logPush(g,`第${CN(g.round)}夜降臨，所有人閉上眼睛。`);}); S.ui.tab='night'; S.ui.dawn=false; render();},
+};
+function startVote(n,t){
+  S.ui.excl=[];
+  saveGame(g=>{g.vote={id:g.gid+'-'+rid(),nominator:n,target:t,open:true,day:g.round}; logPush(g,`${nm(n)} 提名 ${nm(t)}，開始投票。`);});
+}
+const CHANGE = {
+  setRole:(el)=>{const pid=el.dataset.pid; const g=G(); setSecret(pid,s=>{s.gid=g.gid; s.role=el.value||null; s.msgs=s.msgs||[];});},
+  assign:(el)=>{S.ui.assign[el.dataset.pid]=el.value||undefined; if(!el.value) delete S.ui.assign[el.dataset.pid]; render();},
+};
+
+const app=document.getElementById('app');
+app.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b||b.disabled) return; const f=ACT[b.dataset.act]; if(f){e.preventDefault(); f(b.dataset,b);}});
+app.addEventListener('input',e=>{const el=e.target; if(el.dataset.draft) S.d[el.dataset.draft]=el.value; if(el.dataset.note) S.d['note_'+el.dataset.note]=el.value;});
+app.addEventListener('change',e=>{const el=e.target; if(el.dataset.draft){S.d[el.dataset.draft]=el.value;} if(el.dataset.actChange&&CHANGE[el.dataset.actChange]) CHANGE[el.dataset.actChange](el);});
+app.addEventListener('submit',async e=>{
+  e.preventDefault(); const f=e.target.dataset.form;
+  if(f==='rename'){const name=(S.d.joinName||'').trim().slice(0,12); if(!name){toast('請輸入暱稱。'); return;}
+    act('rename',{name}).then(()=>{S.ui.rename=false; render(); toast('暱稱已更新。');},()=>{}); return;}
+  if(f==='join'){
+    const code=(S.d.jCode||'').trim(), pw=S.d.jPw||'', name=(S.d.jName||'').trim();
+    if(!/^\d{4}$/.test(code)){S.entry={join:'房號是四位數字。'}; render(); return;}
+    if(!pw){S.entry={join:'請輸入密碼。'}; render(); return;}
+    if(!name){S.entry={join:'請輸入暱稱。'}; render(); return;}
+    S.entry={busy:true}; render();
+    try{ const r=await api('/api/join',{code,password:pw,name}); S.entry={}; const sess={code:r.code,token:r.token}; storeSess(sess); connect(sess); }
+    catch(err){ S.entry={join:err.message}; render(); }
+    return;
+  }
+  if(f==='create'){
+    const pw=S.d.cPw||''; if(!pw){S.entry={create:'請設定一個密碼。'}; render(); return;}
+    S.entry={busy:true}; render();
+    try{ const r=await api('/api/create',{password:pw}); S.entry={}; const sess={code:r.code,token:r.token,pw}; storeSess(sess); S.ui.tab='setup'; connect(sess); }
+    catch(err){ S.entry={create:err.message}; render(); }
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
