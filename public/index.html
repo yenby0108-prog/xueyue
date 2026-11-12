@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f1217">
-<title>血月鐘塔</title>
+<title>血染鐘樓</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap">
@@ -189,31 +189,31 @@ td.num{font-variant-numeric:tabular-nums;text-align:right}
 <script>
 /* ============ 角色 ============ */
 const ROLES = [
-  {id:'guanxing',name:'觀星者',kind:'good',ability:'每夜選擇兩名玩家，得知他們是否屬於同一陣營。',st:'回答「同一陣營」或「不同陣營」。走火入魔者算魔道，千面客算正道。',first:30,other:30,picks:2,chips:['同一陣營','不同陣營']},
-  {id:'lingxi',name:'靈犀道侶',kind:'good',ability:'首夜，你得知一名正道玩家是誰、擔任什麼角色；他也會得知你的。',st:'挑一名正道玩家，分別私訊兩人對方的名字與角色。',first:20,picks:0},
-  {id:'cangjing',name:'藏經閣長老',kind:'good',ability:'首夜，你得知三個角色，其中恰好一個由在場的魔道玩家擔任。',st:'給一個在場的魔修或心魔角色，再混入兩個其他角色。',first:25,picks:0},
-  {id:'bugua',name:'卜卦師',kind:'good',ability:'每夜，你得知存活的魔道玩家（含心魔）人數是單數還是雙數。',st:'依你喚醒他當下的存活狀況回答。',first:40,other:40,picks:0,chips:['單數','雙數']},
-  {id:'liandan',name:'煉丹師',kind:'good',ability:'每夜（首夜除外）選擇一名其他玩家：今夜他不會被心魔所害。不能連續兩夜選同一人。',st:'記下被護的人。心魔若選中他，今夜無人因此隕落。',other:10,picks:1},
-  {id:'tianji',name:'天機閣弟子',kind:'good',ability:'每夜（首夜除外），你得知最近一名在夜裡隕落者的角色。',st:'昨夜沒人隕落就沿用更早的；從沒人在夜裡隕落則回答「尚無」。',other:50,picks:0},
-  {id:'wenxin',name:'問心鏡主',kind:'good',ability:'每當有玩家在白天被處決，當晚你得知他屬於正道還是魔道。',st:'今天沒有處決就不必喚醒。走火入魔者算魔道，千面客算正道。',other:45,picks:0,chips:['正道','魔道']},
-  {id:'xunye',name:'巡夜弟子',kind:'good',ability:'每夜選擇一名玩家：得知他今夜有沒有醒來行動；若有，得知他選了誰。',st:'最後喚醒他，依那名玩家今夜實際的選擇回答。',first:60,other:60,picks:1,chips:['今夜沒有醒來']},
-  {id:'huangu',name:'還骨師',kind:'good',ability:'每局一次，在夜裡選擇一名已隕落的玩家：他重獲生機，但從此失去能力。',st:'他可以選擇不用。救活後把那人改為存活，並在備註寫下「已無能力」。',other:55,picks:1,dead:true},
-  {id:'jianxiu',name:'劍修',kind:'good',ability:'每局一次，白天時你可以公開向一名玩家出劍：若他是心魔，心魔隕落；否則什麼都不會發生。',st:'由他當眾宣告，你在「公開宣告」公布結果。',picks:0},
-  {id:'shoushan',name:'守山弟子',kind:'good',ability:'你第一次在夜裡被心魔所害時，不會隕落。',st:'第一次被害時保留存活，在備註寫下「已擋一次」。',picks:0},
-  {id:'zhangmen',name:'掌門',kind:'good',ability:'你存活時，你的投票算作兩票。',st:'計票會自動把他算成兩票。',picks:0},
-  {id:'zouhuo',name:'走火入魔者',kind:'burden',ability:'你屬於正道，但所有查驗類能力都會把你當成魔道。',st:'觀星者、問心鏡主查到他時，一律當成魔道回答。',picks:0},
-  {id:'mengzhong',name:'夢中人',kind:'burden',ability:'每夜（首夜除外）你會夢見一名玩家的角色，但夢境大約有一半是假的。',st:'挑一名玩家，自行決定給真的或假的角色。',other:58,picks:0},
-  {id:'xiaoshimei',name:'小師妹',kind:'burden',ability:'若你在白天被處決，當晚心魔可以多害死一名玩家。',st:'當晚喚醒心魔時，把「選幾人」改成 2。',picks:0},
-  {id:'huoxin',name:'惑心使',kind:'minion',ability:'每夜選擇一名玩家：直到下一個夜晚，他的能力失效，說書人可以給他錯誤的資訊。',st:'在備註記下被惑的人，接下來給他的資訊可以是假的。',first:5,other:5,picks:1},
-  {id:'qianmian',name:'千面客',kind:'minion',ability:'查驗類能力會把你當成正道。首夜你額外得知三個不在場的正道角色，可以拿來偽裝。',st:'在「魔道相認」步驟按「送出偽裝身分」。',picks:0},
-  {id:'xueji',name:'血祭者',kind:'minion',ability:'若心魔隕落時仍有五名以上玩家存活，你立刻成為新的心魔。',st:'發生時把他的角色改成原本的心魔角色，並私訊通知他。',picks:0},
-  {id:'luanyan',name:'亂言者',kind:'minion',ability:'每個白天一次，你可以私下告訴說書人一名玩家：他今天的投票不計。',st:'他會私下告訴你；計票時把那人勾成「不計」。',picks:0},
-  {id:'shihun',name:'噬魂魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家：他隕落。',st:'被煉丹師保護或守山弟子第一次被害則不會隕落。',other:20,picks:1},
-  {id:'gumo',name:'蠱魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家種下魂蠱：他會在隔天白天結束時隕落，除非當天有人提名過他。',st:'天亮不宣告這個死亡。入夜前若被種蠱者當天沒被提名，就讓他隕落。',other:20,picks:1},
-  {id:'shuangsheng',name:'雙生魔',kind:'demon',ability:'每夜（首夜除外）選擇一名玩家：他隕落。你第一次被處決時，若有魔修存活，改由一名魔修代你隕落。',st:'第一次被處決時，若還有魔修存活，宣布該魔修隕落，雙生魔留在場上。',other:20,picks:1},
+  {id:'xiyifu',name:'洗衣婦',kind:'good',ability:'首夜，你得知兩個玩家及一個鎮民角色，他們之一是該角色。',st:'請選出兩名玩家，其中至少一個是鎮民，並告知洗衣婦該角色。',first:10,picks:0},
+  {id:'tuxuquanliyuan',name:'圖書管理員',kind:'good',ability:'首夜，你得知兩個玩家及一個外來者角色，他們之一是該角色。',st:'請選出兩名玩家，其中至少一個是外來者，並告知圖書管理員該角色。',first:20,picks:0},
+  {id:'diaochayuan',name:'調查員',kind:'good',ability:'首夜，你得知兩個玩家及一個爪牙角色，他們之一是該角色。',st:'請選出兩名玩家，其中至少一個是爪牙，並告知調查員該角色。',first:30,picks:0},
+  {id:'chef',name:'廚師',kind:'good',ability:'首夜，你得知有多少對邪惡玩家相鄰。',st:'三人連坐算兩對(陌客可視為邪惡陣營)。',first:40,picks:0},
+  {id:'liandan',name:'僧侶',kind:'good',ability:'每夜（首夜除外）選擇一名其他玩家，今夜他不會受到惡魔的負面能力影響。',st:'記下被護的人，今夜他不會死。',other:10,picks:1},
+  {id:'soldier',name:'士兵',kind:'good',ability:'你不會受到惡魔的負面能力影響。',st:'他不會被惡魔殺死'},
+  {id:'wenxin',name:'送葬者',kind:'good',ability:'每夜(首夜除外)，你得知今早被處決的玩家的角色。',st:'今天沒有處決就不必喚醒。',other:50,picks:0},
+  {id:'xunye',name:'鎮長',kind:'good',ability:'若僅剩三名玩家存活，且白天沒有玩家被處決，你的陣營在黃昏立刻獲勝。<br>當你即將在夜晚死亡，可能有另一名玩家代替你死亡。',st:'若死在夜裡，自行決定是否有人代替他死。'},
+  {id:'huangu',name:'占卜師',kind:'good',ability:'每夜，你要選擇兩名玩家，你得知他們當中是否有惡魔，但整場遊戲中，會有一名善良玩家在你的能力下被視為惡魔。',st:'自行決定一位善良玩家被視為惡魔(陌客可視為惡魔)。',first:60,other:70,picks:2},
+  {id:'jianxiu',name:'共情者',kind:'good',ability:'每夜，你得知與你鄰近的兩名存活玩家有幾個屬於邪惡陣營。',st:'陌客可視為邪惡陣營。',first:50,other:60,picks:0},
+  {id:'shoushan',name:'守鴉人',kind:'good',ability:'若你在夜晚中死亡，你會在當晚被喚醒並選擇一名玩家得知該身分。',st:'',other:40,picks:1},
+  {id:'zhenjie',name:'貞潔者',kind:'good',ability:'當你整場遊戲首次被提名時，若提名你的玩家是鎮民，該玩家立刻被處決。',st:''},
+  {id:'zouhuo',name:'獵手',kind:'good',ability:'每場遊戲一次，你可以公開選擇一名玩家，若他是惡魔，該玩家死亡。',st:''},
+  {id:'mengzhong',name:'聖徒',kind:'burden',ability:'若你被處決，你所屬的陣營落敗。',st:'聖徒所屬善良陣營。'},
+  {id:'xiaoshimei',name:'酒鬼',kind:'burden',ability:'你不會知道自己是酒鬼，而是一個鎮民角色。',st:'告知酒鬼一個不在場的鎮民角色，執行其能力。'},
+  {id:'huoxin',name:'管家',kind:'burden',ability:'每夜，你要選擇一名其他玩家，隔天早上處決投票時，除非他同意，否則你不能同意。',st:'',first:70,other:80,picks:1},
+  {id:'qianmian',name:'陌客',kind:'burden',ability:'你可能會被視為任何爪牙角色、任何惡魔角色或邪惡陣營，即使你已死亡。',st:''},
+  {id:'xueji',name:'投毒者',kind:'minion',ability:'每夜，你選擇一名玩家中毒直到下個黃昏。(中毒:該玩家不會得知自己中毒，中毒的玩家可能獲得錯誤資訊或技能發動失效。)',st:'',first:0,other:0,picks:1},
+  {id:'luanyan',name:'間諜',kind:'minion',ability:'每夜，你可以查看魔典。<br>你可能被視為任何鎮民角色、任何外來者角色或善良陣營，即使你已死亡。',st:'',first:80,other:90,picks:0},
+  {id:'shihun',name:'紅唇女郎',kind:'minion',ability:'惡魔死亡時，若仍有五名或以上的玩家存活，你會成為一名新的惡魔。',st:'',other:20},
+  {id:'gumo',name:'男爵',kind:'minion',ability:'你沒有能力。(+2外來者)',st:''},
+  {id:'shuangsheng',name:'小惡魔',kind:'demon',ability:'每夜（首夜除外），你選擇一名玩家死亡，若你選擇自己，會有一名爪牙變成新的惡魔。',st:'',other:30,picks:1},
 ];
 const ROLE = Object.fromEntries(ROLES.map(r=>[r.id,r]));
-const KIND = {good:'正道',burden:'正道・負面',minion:'魔修',demon:'心魔'};
+const KIND = {good:'鎮民',burden:'外來者',minion:'爪牙',demon:'惡魔'};
 const KIND_ORDER = ['good','burden','minion','demon'];
 const teamOf = id => {const k=ROLE[id]?.kind; return k==='minion'||k==='demon'?k:'good';};
 const evil = id => teamOf(id)!=='good';
@@ -348,7 +348,7 @@ function view(){
 }
 function entryView(){
   const e=S.entry||{};
-  return `<div class="lobby-hero"><span class="seal">月</span><h1>血月鐘塔</h1><p>血月升起，鐘塔裡混進了心魔。輸入房號和密碼進入房間，或自己開一間當說書人。</p></div>
+  return `<div class="lobby-hero"><span class="seal">血</span><h1>血染鐘樓</h1><p>血月升起，鐘塔裡混進了壞人。輸入房號和密碼進入房間，或自己開一間當說書人。</p></div>
   <div class="entry">
     <form class="card" data-form="join"><h2>加入房間</h2>
       <label class="field"><span>房號</span><input type="text" id="jCode" data-draft="jCode" inputmode="numeric" maxlength="4" placeholder="四位數字" value="${esc(S.d.jCode||'')}" autocomplete="off"></label>
@@ -372,7 +372,7 @@ function header(){
   const leaveBtn = S.owner
     ? (S.ui.confirm==='close' ? `<span class="small warn">關閉後所有人都會離開</span><button class="btn sm red" data-act="closeRoom">確定關閉</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button>` : `<button class="btn sm ghost" data-act="confirm" data-v="close">關閉房間</button>`)
     : (S.ui.confirm==='leave' ? `<span class="small warn">離開後要重新輸入密碼加入</span><button class="btn sm red" data-act="leave">確定離開</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button>` : `<button class="btn sm ghost" data-act="confirm" data-v="leave">離開房間</button>`);
-  return `<header class="bar"><div class="brand"><span class="seal">月</span><div><h1>血月鐘塔</h1><p>房號 ${esc(S.sess.code)}・${who}</p></div></div>
+  return `<header class="bar"><div class="brand"><span class="seal">血</span><div><h1>血染鐘樓</h1><p>房號 ${esc(S.sess.code)}・${who}</p></div></div>
   <div class="roomchip">${!S.conn?'<span class="small warn">連線中斷，重新連線中…</span>':''}${!S.owner&&!S.stOnline?'<span class="small muted">說書人目前離線</span>':''}${ph?`<div class="phase ${cls}">${ph}</div>`:''}${leaveBtn}</div></header>`;
 }
 function inviteCard(){
@@ -391,7 +391,7 @@ function town(opts={}){
   const vote=g.vote; const raised = vote ? Object.entries(S.votes).filter(([,v])=>v.vid===vote.id&&v.up).map(([p])=>p) : [];
   const glyph = !g.status||g.status==='lobby' ? '候' : g.status==='ended' ? '終' : g.phase==='night' ? '夜' : '日';
   const gcls = g.phase==='night'&&g.status==='playing' ? 'night' : 'day';
-  const sub = lobby ? `${slots.filter(Boolean).length} / ${n} 已入座` : g.status==='ended' ? (g.winner==='good'?'正道得勝':'魔道得勝') : `存活 ${living().length} / ${n}`;
+  const sub = lobby ? `${slots.filter(Boolean).length} / ${n} 已入座` : g.status==='ended' ? (g.winner==='good'?'好人得勝':'邪惡陣營得勝') : `存活 ${living().length} / ${n}`;
   const pct = n ? Math.min(19, 260/Math.max(n,1)) : 19;
   const R = n<=6 ? 37 : 40;
   const toks = slots.map((pid,i)=>{
@@ -421,7 +421,7 @@ function town(opts={}){
 }
 function logCard(){
   const log=(G().log||[]).slice().reverse();
-  return `<section class="card"><div class="card-h"><h3>城中消息</h3><span class="eyebrow">公開</span></div>
+  return `<section class="card"><div class="card-h"><h3>樓中消息</h3><span class="eyebrow">公開</span></div>
   <div class="log">${log.length?log.map(l=>`<div><span class="t">${hhmm(l.t)}</span>${esc(l.text)}</div>`).join(''):'<p class="muted small">還沒有消息。</p>'}</div></section>`;
 }
 
@@ -444,7 +444,7 @@ function playerView(){
 }
 function joinView(me){
   return `<div class="center"><section class="card"><h2>${me?'改暱稱':'報名入座'}</h2>
-  <p class="muted">輸入你的暱稱（最多 12 個字），它會顯示在圓桌座位和城中消息裡。</p>
+  <p class="muted">輸入你的暱稱（最多 12 個字），它會顯示在圓桌座位和樓中消息裡。</p>
   <form class="row" data-form="rename"><input type="text" id="joinName" data-draft="joinName" maxlength="12" placeholder="例如：阿明" value="${esc(S.d.joinName??(me?me.name:''))}" autocomplete="off">
   <button class="btn pri" type="submit">${me?'儲存':'報名'}</button>${me?'<button class="btn ghost" type="button" data-act="cancelRename">取消</button>':''}</form></section></div>`;
 }
@@ -470,7 +470,7 @@ function roleCard(role){
   const r=ROLE[role];
   return `<section class="card role ${r.kind}"><div class="card-h"><span class="eyebrow">你的身分</span><button class="btn sm ghost" data-act="reveal">${S.ui.reveal?'蓋上':'翻開'}</button></div>
   ${S.ui.reveal?`<div class="row"><h2>${r.name}</h2><span class="tag ${r.kind}">${KIND[r.kind]}</span></div><p class="ab">${r.ability}</p>
-  <p class="small muted">${r.kind==='good'||r.kind==='burden'?'勝利條件：處決心魔。':'勝利條件：讓場上只剩兩名存活玩家，而心魔仍活著。'}</p>`
+  <p class="small muted">${r.kind==='good'||r.kind==='burden'?'勝利條件：處決壞人。':'勝利條件：讓場上只剩兩名存活玩家，而壞人仍活著。'}</p>`
   :`<div class="veil">按「翻開」查看身分。小心旁人偷看。</div>`}</section>`;
 }
 function wakePanel(w){
@@ -547,16 +547,16 @@ function roleOptions(cur){
   return `<option value="">（無）</option>`+KIND_ORDER.map(k=>`<optgroup label="${KIND[k]}">${ROLES.filter(r=>r.kind===k).map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${r.name}</option>`).join('')}</optgroup>`).join('');
 }
 function announceCard(){
-  return `<section class="card"><h3>公開宣告</h3><div class="row"><input type="text" id="ann" data-draft="ann" placeholder="例如：劍修出劍，什麼也沒發生" value="${esc(S.d.ann||'')}"><button class="btn" data-act="announce">發布</button></div></section>`;
+  return `<section class="card"><h3>公開宣告</h3><div class="row"><input type="text" id="ann" data-draft="ann" placeholder="" value="${esc(S.d.ann||'')}"><button class="btn" data-act="announce">發布</button></div></section>`;
 }
 function winCard(){
   const c=S.ui.confirm;
-  return `<section class="card"><h3>結束本局</h3><p class="small muted">正道處決心魔即勝；只剩兩名存活玩家且心魔仍活著，魔道勝。</p>
-  ${c==='good'||c==='evil'?`<div class="row"><span>確定宣告 <b>${c==='good'?'正道':'魔道'}</b> 獲勝，並公開所有人身分？</span><button class="btn pri sm" data-act="win" data-team="${c}">確定</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button></div>`
-  :`<div class="row"><button class="btn sm" data-act="confirm" data-v="good">正道獲勝</button><button class="btn sm" data-act="confirm" data-v="evil">魔道獲勝</button></div>`}</section>`;
+  return `<section class="card"><h3>結束本局</h3><p class="small muted">好人處決壞人即勝；只剩兩名存活玩家且壞人仍活著，邪惡陣營勝。</p>
+  ${c==='good'||c==='evil'?`<div class="row"><span>確定宣告 <b>${c==='good'?'好人':'邪惡陣營'}</b> 獲勝，並公開所有人身分？</span><button class="btn pri sm" data-act="win" data-team="${c}">確定</button><button class="btn sm ghost" data-act="confirm" data-v="">取消</button></div>`
+  :`<div class="row"><button class="btn sm" data-act="confirm" data-v="good">好人獲勝</button><button class="btn sm" data-act="confirm" data-v="evil">邪惡陣營獲勝</button></div>`}</section>`;
 }
 function endCard(){
-  return `<section class="card"><h3>${G().winner==='good'?'正道得勝':'魔道得勝'}</h3><p class="muted small">所有人的身分已公開在圓桌上。</p>
+  return `<section class="card"><h3>${G().winner==='good'?'好人得勝':'邪惡陣營得勝'}</h3><p class="muted small">所有人的身分已公開在圓桌上。</p>
   <div class="row"><button class="btn pri" data-act="newGame">再開一局（保留座位）</button></div></section>`;
 }
 
@@ -588,13 +588,13 @@ function setupView(){
   </section></div>
   <div class="col">${lobby?`
   <section class="card"><div class="card-h"><h3>挑選本局角色</h3><span class="eyebrow">角色池</span></div>
-  <p class="small muted">${n<5?'至少 5 人才能開局。':`${n} 人建議：正道 ${rec.good}、魔修 ${rec.minion}、心魔 1。正道裡可放 0 到 2 個負面角色增加變數。`}</p>
-  <div class="counter"><span>已選 <b>${pool.length}</b> / ${n}</span><span class="${cnt.good===rec.good?'ok':''}">正道 <b>${cnt.good}</b></span><span class="${cnt.minion===rec.minion?'ok':''}">魔修 <b>${cnt.minion}</b></span><span class="${cnt.demon===1?'ok':'warn'}">心魔 <b>${cnt.demon}</b></span></div>
+  <p class="small muted">${n<5?'至少 5 人才能開局。':`${n} 人建議：好人 ${rec.good}、爪牙 ${rec.minion}、壞人 1。好人裡可放 0 到 2 個負面角色增加變數。`}</p>
+  <div class="counter"><span>已選 <b>${pool.length}</b> / ${n}</span><span class="${cnt.good===rec.good?'ok':''}">好人 <b>${cnt.good}</b></span><span class="${cnt.minion===rec.minion?'ok':''}">爪牙 <b>${cnt.minion}</b></span><span class="${cnt.demon===1?'ok':'warn'}">壞人 <b>${cnt.demon}</b></span></div>
   ${KIND_ORDER.map(k=>`<div class="stack"><span class="eyebrow">${KIND[k]}</span><div class="chips">${ROLES.filter(r=>r.kind===k).map(r=>`<button class="chip ${pool.includes(r.id)?'on':''}" data-act="poolToggle" data-role="${r.id}" title="${esc(r.ability)}">${r.name}</button>`).join('')}</div></div>`).join('')}
   <div class="row"><button class="btn" data-act="autoPool" ${n<5?'disabled':''}>依人數隨機挑角色</button><button class="btn pri" data-act="randomAssign" ${pool.length===n&&n>=5?'':'disabled'}>把角色池隨機發給座位</button></div>
   </section>
   <section class="card"><h3>開局</h3>
-  <div class="counter"><span>已分配 <b>${Object.keys(assign).filter(p=>seatOf(p)&&assign[p]).length}</b> / ${n}</span><span>正道 <b>${acnt.good}</b></span><span>魔修 <b>${acnt.minion}</b></span><span class="${acnt.demon===1?'ok':'warn'}">心魔 <b>${acnt.demon}</b></span></div>
+  <div class="counter"><span>已分配 <b>${Object.keys(assign).filter(p=>seatOf(p)&&assign[p]).length}</b> / ${n}</span><span>好人 <b>${acnt.good}</b></span><span>爪牙 <b>${acnt.minion}</b></span><span class="${acnt.demon===1?'ok':'warn'}">壞人 <b>${acnt.demon}</b></span></div>
   <p class="small muted">可以先隨機發，再在左邊座位旁的選單手動調整。開局後，每位玩家只會在自己的手機上看到自己的身分。</p>
   <div class="row"><button class="btn pri big" data-act="startGame" ${allAssigned&&acnt.demon>=1&&n>=5?'':'disabled'}>開局，進入第一夜</button></div></section>`
   :`<section class="card"><h3>本局進行中</h3><p class="muted small">角色已發出。要調整某人的身分，到「圓桌」點他的座位。座位順序仍可以調整。</p>
@@ -623,8 +623,8 @@ function evilStep(){
   const ev=seats().filter(s=>evil(roleOf(s.id)));
   const demon=ev.filter(s=>teamOf(roleOf(s.id))==='demon'); const mins=ev.filter(s=>teamOf(roleOf(s.id))==='minion');
   const qm=seats().filter(s=>roleOf(s.id)==='qianmian');
-  return `<article class="step"><div class="step-h"><span class="ord">1</span><b>魔道相認</b></div>
-  <p class="hint">心魔：${demon.map(s=>esc(nm(s.id))).join('、')||'無'}；魔修：${mins.map(s=>esc(nm(s.id))).join('、')||'無'}。按下後，每位魔道玩家會收到同伴名單。</p>
+  return `<article class="step"><div class="step-h"><span class="ord">1</span><b>邪惡陣營相認</b></div>
+  <p class="hint">壞人：${demon.map(s=>esc(nm(s.id))).join('、')||'無'}；爪牙：${mins.map(s=>esc(nm(s.id))).join('、')||'無'}。按下後，每位邪惡陣營玩家會收到同伴名單。</p>
   <div class="row"><button class="btn sm pri" data-act="sendEvil">送出相認資訊</button>${qm.length?`<button class="btn sm" data-act="sendBluffs">送出千面客的偽裝身分</button>`:''}</div></article>`;
 }
 function stepCard(st){
@@ -697,7 +697,7 @@ function dayView(){
 /* 規則 */
 function rulesView(){
   return `<div class="col"><section class="card"><h2>怎麼玩</h2><div class="rules">
-  <div><b>兩個陣營</b>正道弟子裡混進了魔修，背後是一隻心魔。正道要在白天找出並處決心魔；魔道要撐到場上只剩兩名存活玩家，而心魔仍活著。</div>
+  <div><b>兩個陣營</b>鐘樓的居民裡混進了爪牙，背後藏著一名惡魔。鎮民與外來者同一邊，要在白天找出並處決壞人；邪惡陣營（爪牙與惡魔）要撐到場上只剩兩名存活玩家，而壞人仍活著。</div>
   <div><b>夜晚</b>所有人閉眼。說書人依序喚醒有能力的人，被喚醒的人在自己手機上選擇目標，再從私訊收到資訊。中了惑心的人可能收到錯誤資訊。</div>
   <div><b>白天</b>天亮公布昨夜隕落的人，接著自由討論、私下密談。每名存活玩家每天可以提名一次，每名玩家每天只能被提名一次。</div>
   <div><b>投票</b>說書人開啟投票後，想處決被提名者的人舉手。票數要達到存活人數的一半（無條件進位）才有效。當天最高票者被處決，最高票平手就不處決。每天最多處決一人。</div>
@@ -723,7 +723,7 @@ const ACT = {
   nominate:()=>{const t=S.d.nomT; if(!t){toast('先選擇要提名的人。'); return;} act('nominate',{target:t}).then(()=>toast('已送出提名，等說書人開啟投票。'),()=>{});},
   leave:()=>leave(),
   closeRoom:()=>{S.ui.confirm=null; act('closeRoom').then(()=>leave('房間已關閉。'),()=>{});},
-  copyInvite:()=>{const t=`來玩血月鐘塔！\n網址：${location.origin}\n房號：${S.sess.code}\n密碼：${S.sess.pw||''}`;
+  copyInvite:()=>{const t=`來玩血染鐘樓！\n網址：${location.origin}\n房號：${S.sess.code}\n密碼：${S.sess.pw||''}`;
     try{ navigator.clipboard.writeText(t).then(()=>toast('已複製，貼給朋友吧。'),()=>toast('無法自動複製，請手動抄下房號和密碼。')); }catch(e){ toast('無法自動複製，請手動抄下房號和密碼。'); }},
   sit:d=>{const i=+d.i; if(!isLobby()) return; if(claims()[i]){toast('這個位子有人了，換一個吧。'); return;}
     const me=clone(S.players[S.me]); me.seat=i; me.seatAt=Date.now();
@@ -765,7 +765,7 @@ const ACT = {
   sendMsg:d=>{const t=(S.d['msg_'+d.pid]||'').trim(); if(!t){toast('先寫下要傳的內容。'); return;} S.d['msg_'+d.pid]=''; sendMsg(d.pid,t,d.clear==='1').then(()=>toast('已私訊 '+nm(d.pid)+'。'));},
   chipMsg:d=>{const k='msg_'+d.pid; S.d[k]=(S.d[k]?S.d[k]+'；':'')+d.text; render();},
   announce:()=>{const t=(S.d.ann||'').trim(); if(!t) return; S.d.ann=''; saveGame(g=>logPush(g,t));},
-  win:d=>{S.ui.confirm=null; const rev={}; seats().forEach(s=>{const r=roleOf(s.id); if(r) rev[s.id]=r;}); saveGame(g=>{g.status='ended'; g.winner=d.team; g.reveal=rev; g.vote=null; logPush(g,(d.team==='good'?'心魔伏誅，正道得勝！':'心魔得逞，魔道得勝！')+' 所有身分已公開。');}); S.ui.tab='town'; render();},
+  win:d=>{S.ui.confirm=null; const rev={}; seats().forEach(s=>{const r=roleOf(s.id); if(r) rev[s.id]=r;}); saveGame(g=>{g.status='ended'; g.winner=d.team; g.reveal=rev; g.vote=null; logPush(g,(d.team==='good'?'壞人伏誅，好人得勝！':'壞人得逞，邪惡陣營得勝！')+' 所有身分已公開。');}); S.ui.tab='town'; render();},
 
   // 說書人：夜晚
   wake:d=>{const r=ROLE[roleOf(d.pid)]; const n=Math.max(1,Math.min(6,parseInt(S.d['pk_'+d.pid]??r.picks,10)||r.picks));
@@ -773,11 +773,11 @@ const ACT = {
     setSecret(d.pid,s=>{s.wake={k:rid(),picks:n,prompt,dead:!!r.dead};}).then(()=>toast('已喚醒 '+nm(d.pid)+'。'));},
   sendEvil:()=>{const ev=seats().filter(s=>evil(roleOf(s.id)));
     const demon=ev.filter(s=>teamOf(roleOf(s.id))==='demon').map(s=>nm(s.id)); const mins=ev.filter(s=>teamOf(roleOf(s.id))==='minion').map(s=>nm(s.id));
-    const text=`魔道相認：心魔是 ${demon.join('、')||'（無）'}；魔修是 ${mins.join('、')||'（無）'}。`;
+    const text=`邪惡陣營相認：壞人是 ${demon.join('、')||'（無）'}；爪牙是 ${mins.join('、')||'（無）'}。`;
     ev.forEach(s=>sendMsg(s.id,text,false)); toast('已送出相認資訊給 '+ev.length+' 人。');},
   sendBluffs:()=>{const inPlay=new Set(seats().map(s=>roleOf(s.id)));
     const pool=shuffle(ROLES.filter(r=>(r.kind==='good')&&!inPlay.has(r.id))).slice(0,3).map(r=>r.name);
-    seats().filter(s=>roleOf(s.id)==='qianmian').forEach(s=>sendMsg(s.id,'可用來偽裝的正道角色（都不在場）：'+pool.join('、'),false));
+    seats().filter(s=>roleOf(s.id)==='qianmian').forEach(s=>sendMsg(s.id,'可用來偽裝的好人角色（都不在場）：'+pool.join('、'),false));
     toast('已送出偽裝身分：'+pool.join('、'));},
   dawn:()=>{S.ui.dawn=true; S.ui.deaths=[]; render();},
   cancelDawn:()=>{S.ui.dawn=false; render();},
